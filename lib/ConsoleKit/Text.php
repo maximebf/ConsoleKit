@@ -1,7 +1,27 @@
 <?php
+/**
+ * ConsoleKit
+ * Copyright (c) 2012 Maxime Bouroumeau-Fuseau
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ *
+ * @author Maxime Bouroumeau-Fuseau
+ * @copyright 2012 (c) Maxime Bouroumeau-Fuseau
+ * @license http://www.opensource.org/licenses/mit-license.php
+ * @link http://github.com/maximebf/ConsoleKit
+ */
 
 namespace ConsoleKit;
 
+/**
+ * Utility functions to format and output text
+ */
 class Text
 {
     const RESET_COLORS = "\033[0m";
@@ -50,6 +70,11 @@ class Text
     /**
      * Formats $text according to $options
      * 
+     * Available options:
+     *  - indent: number of indentation
+     *  - bgcolor: background color (a key from the $backgroundColors array)
+     *  - fgcolor: foreground color (a key from the $foregroundColors array)
+     * 
      * @param string $text
      * @param array $options
      */
@@ -71,7 +96,7 @@ class Text
     }
     
     /**
-     * Prints some text
+     * Prints some formated text
      * 
      * @param string $text
      * @param array $options
@@ -82,7 +107,7 @@ class Text
     }
     
     /**
-     * Prints a line of text
+     * Prints a line of formated text
      * 
      * @param string $text
      * @param array $options

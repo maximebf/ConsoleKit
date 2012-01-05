@@ -1,7 +1,27 @@
 <?php
+/**
+ * ConsoleKit
+ * Copyright (c) 2012 Maxime Bouroumeau-Fuseau
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ *
+ * @author Maxime Bouroumeau-Fuseau
+ * @copyright 2012 (c) Maxime Bouroumeau-Fuseau
+ * @license http://www.opensource.org/licenses/mit-license.php
+ * @link http://github.com/maximebf/ConsoleKit
+ */
  
 namespace ConsoleKit;
 
+/**
+ * Registry of available commands and command runner
+ */
 class Console
 {
     /** @var array */
@@ -9,6 +29,7 @@ class Console
     
     /**
      * @param array $args
+     * @return mixed Results of the command callback
      */
     public static function run(array $argv = null, $optionsParserClassName = 'ConsoleKit\OptionsParser')
     {
@@ -28,6 +49,9 @@ class Console
         }
         
         $classname = self::$commands[$command];
+        if (function_exists($classname)) {
+            return call_user_func($classname, $args, $options);
+        }
         $instance = new $classname();
         return $instance->execute($args, $options);
     }
@@ -35,8 +59,8 @@ class Console
     /**
      * Registers a command
      * 
-     * @param array|string $command
-     * @param string $class
+     * @param array|string $command Command name to be used in the shell
+     * @param string $class Associated class name, function name or Command instance
      */
     public static function register($command, $class = null)
     {
@@ -47,7 +71,10 @@ class Console
             return;
         }
 
-        if ($class === null || !is_subclass_of($class, 'ConsoleKit\Command')) {
+        if ($class === null || (!class_exists($class) && !function_exists($class))) {
+            throw new ConsoleException("'$class' must reference a class or a function");
+        }
+        if (class_exists($class) && !is_subclass_of($class, 'ConsoleKit\Command')) {
             throw new ConsoleException("'$class' must be a subclass of 'ConsoleKit\Command'");
         }
         self::$commands[$command] = $class;

@@ -43,10 +43,12 @@ class Console
 
     /**
      * @param OptionsParser $parser
+     * @return Console
      */
     public function setOptionsParser(OptionsParser $parser)
     {
         $this->optionsParser = $parser;
+        return $this;
     }
 
     /**
@@ -62,12 +64,14 @@ class Console
      *
      * @see addCommand()
      * @param array $commands
+     * @return Console
      */
     public function addCommands(array $commands)
     {
         foreach ($commands as $name => $command) {
             $this->addCommand($name, $command);
         }
+        return $this;
     }
     
     /**
@@ -75,6 +79,7 @@ class Console
      * 
      * @param string $command Command name to be used in the shell
      * @param string $class Associated class name, function name or Command instance
+     * @return Console
      */
     public function addCommand($command, $class)
     {
@@ -85,6 +90,7 @@ class Console
             throw new ConsoleException("'$class' must be a subclass of 'ConsoleKit\Command'");
         }
         $this->commands[$command] = $class;
+        return $this;
     }
 
     /**
@@ -93,6 +99,7 @@ class Console
      * @param string $dir
      * @param string $namespace
      * @param bool $includeFiles
+     * @return Console
      */
     public function addCommandsFromDir($dir, $namespace = '', $includeFiles = false)
     {
@@ -110,6 +117,7 @@ class Console
             }
             $this->addCommand($name, $className);
         }
+        return $this;
     }
     
     /**

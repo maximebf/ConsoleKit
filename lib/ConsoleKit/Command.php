@@ -81,10 +81,12 @@ abstract class Command
      * 
      * @param string $text
      * @param array $options
+     * @return Command
      */
     public function write($text, array $options = array())
     {
         Text::write($text, $options);
+        return $this;
     }
     
     /**
@@ -92,9 +94,11 @@ abstract class Command
      * 
      * @param string $text
      * @param array $options
+     * @return Command
      */
     public function writeln($text, array $options = array())
     {
         Text::writeln($text, $options);
+        return $this;
     }
 }

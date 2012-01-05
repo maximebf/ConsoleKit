@@ -25,59 +25,66 @@ namespace ConsoleKit;
 class Console
 {
     /** @var array */
-    private static $commands = array();
-    
-    /**
-     * @param array $args
-     * @return mixed Results of the command callback
-     */
-    public static function run(array $argv = null, $optionsParserClassName = 'ConsoleKit\OptionsParser')
-    {
-        if ($argv === null) {
-            $argv = isset($_SERVER['argv']) ? array_slice($_SERVER['argv'], 1) : array();
-        }
+    protected $commands = array();
 
-        $optionParser = new $optionsParserClassName();
-        list($args, $options) = $optionParser->parse($argv);
-        if (!count($args)) {
-            throw new ConsoleException("Missing command name");
+    /**
+     * @var OptionsParser
+     */
+    protected $optionsParser;
+
+    /**
+     * @param array $commands
+     */
+    public function __construct(array $commands = array(), OptionsParser $parser = null)
+    {
+        $this->addCommands($commands);
+        $this->optionsParser = $parser ?: new DefaultOptionsParser();
+    }
+
+    /**
+     * @param OptionsParser $parser
+     */
+    public function setOptionsParser(OptionsParser $parser)
+    {
+        $this->optionsParser = $parser;
+    }
+
+    /**
+     * @return OptionsParser
+     */
+    public function getOptionsParser()
+    {
+        return $this->optionsParser;
+    }
+
+    /**
+     * Adds multiple commands at once
+     *
+     * @see addCommand()
+     * @param array $commands
+     */
+    public function addCommands(array $commands)
+    {
+        foreach ($commands as $name => $command) {
+            $this->addCommand($name, $command);
         }
-        
-        $command = array_shift($args);
-        if (!isset(self::$commands[$command])) {
-            throw new ConsoleException("Command '$command' does not exist");
-        }
-        
-        $classname = self::$commands[$command];
-        if (function_exists($classname)) {
-            return call_user_func($classname, $args, $options);
-        }
-        $instance = new $classname();
-        return $instance->execute($args, $options);
     }
     
     /**
      * Registers a command
      * 
-     * @param array|string $command Command name to be used in the shell
+     * @param string $command Command name to be used in the shell
      * @param string $class Associated class name, function name or Command instance
      */
-    public static function register($command, $class = null)
+    public function addCommand($command, $class)
     {
-        if (is_array($command)) {
-            foreach ($command as $k => $v) {
-                self::register($k, $v);
-            }
-            return;
-        }
-
-        if ($class === null || (!class_exists($class) && !function_exists($class))) {
+        if (!class_exists($class) && !function_exists($class)) {
             throw new ConsoleException("'$class' must reference a class or a function");
         }
         if (class_exists($class) && !is_subclass_of($class, 'ConsoleKit\Command')) {
             throw new ConsoleException("'$class' must be a subclass of 'ConsoleKit\Command'");
         }
-        self::$commands[$command] = $class;
+        $this->commands[$command] = $class;
     }
 
     /**
@@ -87,7 +94,7 @@ class Console
      * @param string $namespace
      * @param bool $includeFiles
      */
-    public static function registerFromDir($dir, $namespace = '', $includeFiles = false)
+    public function addCommandsFromDir($dir, $namespace = '', $includeFiles = false)
     {
         foreach (new DirectoryIterator($dir) as $file) {
             if ($file->isDir() || substr($file->getFilename(), 0, 1) === '.' 
@@ -101,7 +108,35 @@ class Console
             if ($includeFiles) {
                 include $file->getPathname();
             }
-            self::register($name, $className);
+            $this->addCommand($name, $className);
         }
+    }
+    
+    /**
+     * @param array $args
+     * @return mixed Results of the command callback
+     */
+    public function run(array $argv = null)
+    {
+        if ($argv === null) {
+            $argv = isset($_SERVER['argv']) ? array_slice($_SERVER['argv'], 1) : array();
+        }
+
+        list($args, $options) = $this->getOptionsParser()->parse($argv);
+        if (!count($args)) {
+            throw new ConsoleException("Missing command name");
+        }
+        
+        $command = array_shift($args);
+        if (!isset($this->commands[$command])) {
+            throw new ConsoleException("Command '$command' does not exist");
+        }
+        
+        $classname = $this->commands[$command];
+        if (function_exists($classname)) {
+            return call_user_func($classname, $args, $options);
+        }
+        $instance = new $classname();
+        return $instance->execute($args, $options);
     }
 }

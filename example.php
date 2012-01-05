@@ -63,10 +63,10 @@ class SayCommand extends Command
     }
 }
 
-Console::register(array(
+$console = new Console(array(
     'hello' => 'HelloWorldCommand',
     'say-hello' => 'SayHelloCommand',
     'say' => 'SayCommand'
 ));
 
-Console::run();
+$console->run();

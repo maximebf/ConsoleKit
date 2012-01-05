@@ -28,5 +28,5 @@ You will also need to configure a class autoloader. You can use the following on
         }
     }
 
-    ConsoleKit\Console::register('hello', 'HelloWorldCommand');
-    ConsoleKit\Console::run();
+    $console = new ConsoleKit\Console(array('hello' => 'HelloWorldCommand'));
+    $console->run();

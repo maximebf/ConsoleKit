@@ -1,0 +1,154 @@
+<?php
+/**
+ * ConsoleKit
+ * Copyright (c) 2012 Maxime Bouroumeau-Fuseau
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ *
+ * @author Maxime Bouroumeau-Fuseau
+ * @copyright 2012 (c) Maxime Bouroumeau-Fuseau
+ * @license http://www.opensource.org/licenses/mit-license.php
+ * @link http://github.com/maximebf/ConsoleKit
+ */
+
+namespace ConsoleKit;
+
+class Utils
+{
+    /**
+     * Returns the value from $key in $array or $default
+     *
+     * @param array $array
+     * @param string $key
+     * @param mixed $default
+     * @return mixed
+     */
+    public static function get($array, $key, $default = null)
+    {
+        if (array_key_exists($key, $array)) {
+            return $array[$key];
+        }
+        return $default;
+    }
+
+    /**
+     * Finds the first file that match the filename in any of 
+     * the specified directories.
+     * 
+     * @param string $filename
+     * @param array $dirs
+     * @return string
+     */
+    public static function find($filename, array $dirs = array())
+    {
+        if (empty($dirs)) {
+            if ($filename = realpath($filename)) {
+                return $filename;
+            }
+        } else {
+            foreach ((array) $dirs as $dir) {
+                $pathname = self::join($dir, $filename);
+                if ($pathname = realpath($pathname)) {
+                    return $pathname;
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Extracts files from an array of args
+     *
+     * @param array $args
+     * @param bool $allowWildcards Whether wildcards are allowed
+     * @return array
+     */
+    public static function filterFiles($args, $allowWildcards = true)
+    {
+        $files = array();
+        foreach ($args as $arg) {
+            if (file_exists($arg)) {
+                $files[] = $arg;
+            } else if ($allowWildcards && strpos($arg, '*') !== false) {
+                $files = array_merge($files, glob($arg));
+            }
+        }
+        return $files;
+    }
+
+    /**
+     * Joins paths together
+     *
+     * @param string $path1
+     * @param string $path2
+     * @param string ...
+     * @return string
+     */
+    public static function join($path1, $path2) {
+        $ds = DIRECTORY_SEPARATOR;
+        return str_replace("$ds$ds", $ds, implode($ds, array_filter(func_get_args())));
+    }
+
+    /**
+     * Creates a directory recursively
+     *
+     * @param string $dir
+     * @param octal $mode
+     */
+    public static function mkdir($dir, $mode = 0777)
+    {
+        if (!file_exists($dir)) {
+            mkdir($dir, $mode, true);
+        }
+    }
+
+    /**
+     * Creates a file and its directory
+     *
+     * @param string $filename
+     * @param string $content
+     */
+    public static function touch($filename, $content = '')
+    {
+        self::mkdir(dirname($filename));
+        file_put_contents($filename, $content);
+    }
+
+    /**
+     * Returns piped in data
+     *
+     * @return string
+     */
+    public static function pipedIn()
+    {
+        return file_get_contents('php://stdin');
+    }
+
+    /**
+     * Returns a dash-cased string into a camelCased string
+     *
+     * @param string $string
+     * @return string
+     */
+    public static function camelize($string)
+    {
+        return str_replace(' ', '', ucwords(str_replace('-', ' ', $string)));
+    }
+
+    /**
+     * Returns a camelCased string into a dash-cased string
+     *
+     * @param string $string
+     * @return string
+     */
+    public static function dashized($string)
+    {
+        return strtolower(preg_replace('/(?<=[a-z])([A-Z])/', '-$1', $string));
+    }
+}

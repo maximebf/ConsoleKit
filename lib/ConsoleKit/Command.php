@@ -55,6 +55,9 @@ abstract class Command
     /** @var Console */
     protected $console;
 
+    /** @var array */
+    protected $defaultFormatOptions = array();
+
     /**
      * @param Console $console
      */
@@ -87,7 +90,7 @@ abstract class Command
             throw new ConsoleException("Not enough arguments");
         }
         
-        $command = str_replace(' ', '', ucwords(str_replace('-', ' ', array_shift($args))));
+        $command = Utils::camelize(array_shift($args));
         $method = "execute$command";
         
         if (!method_exists($this, $method)) {
@@ -101,11 +104,15 @@ abstract class Command
      * Formats text using a {@see TextFormater}
      *
      * @param string $text
-     * @param array $formatOptions
+     * @param int|array $formatOptions Either an array of options for TextFormater or a color code
      * @return string
      */
-    public function format($text, array $formatOptions = array())
+    public function format($text, $formatOptions = array())
     {
+        if (is_int($formatOptions) || is_string($formatOptions)) {
+            $formatOptions = array('fgcolor' => $formatOptions);
+        }
+        $formatOptions = array_merge($this->defaultFormatOptions, $formatOptions);
         $formater = new TextFormater($formatOptions);
         return $formater->format($text);
     }
@@ -132,14 +139,26 @@ abstract class Command
     /**
      * Writes some text to the text writer
      * 
+     * @see format()
      * @param string $text
-     * @param array $formatOptions
+     * @param int|array $formatOptions
      * @return Command
      */
-    public function write($text, array $formatOptions = array())
+    public function write($text, $formatOptions = array(), $pipe = TextWriter::STDOUT)
     {
-        $this->console->getTextWriter()->write($this->format($text, $formatOptions));
+        $this->console->getTextWriter()->write($this->format($text, $formatOptions), $pipe);
         return $this;
+    }
+
+    /**
+     * Writes a message in bold red to STDERR
+     *
+     * @param string $text
+     * @return Command
+     */
+    public function writeerr($text)
+    {
+        return $this->write($text, Colors::RED | Colors::BOLD, TextWriter::STDERR);
     }
     
     /**
@@ -147,10 +166,10 @@ abstract class Command
      * 
      * @see write()
      * @param string $text
-     * @param array $formatOptions
+     * @param int|array $formatOptions
      * @return Command
      */
-    public function writeln($text, array $formatOptions = array())
+    public function writeln($text, $formatOptions = array())
     {
         return $this->write("$text\n", $formatOptions);
     }

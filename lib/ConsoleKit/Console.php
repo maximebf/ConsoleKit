@@ -33,6 +33,15 @@ class Console
     /** @var TextWriter */
     protected $textWriter;
 
+    /** @var bool */
+    protected $exitOnException = true;
+
+    /** @var string */
+    protected $helpCommand = 'help';
+
+    /** @var string */
+    protected $helpCommandClass = 'ConsoleKit\HelpCommand';
+
     /**
      * @param array $commands
      */
@@ -40,6 +49,7 @@ class Console
     {
         $this->optionsParser = $parser ?: new DefaultOptionsParser();
         $this->textWriter = $writer ?: new EchoTextWriter();
+        $this->addCommand($this->helpCommandClass, $this->helpCommand);
         $this->addCommands($commands);
     }
 
@@ -80,6 +90,26 @@ class Console
     }
 
     /**
+     * Sets whether to call exit(1) when an exception is caught
+     *
+     * @param bool $exit
+     * @return Console
+     */
+    public function setExitOnException($exit = true)
+    {
+        $this->exitOnException = $exit;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function exitsOnException()
+    {
+        return $this->exitOnException;
+    }
+
+    /**
      * Adds multiple commands at once
      *
      * @see addCommand()
@@ -89,7 +119,7 @@ class Console
     public function addCommands(array $commands)
     {
         foreach ($commands as $name => $command) {
-            $this->addCommand($name, $command);
+            $this->addCommand($command, is_numeric($name) ? null : $name);
         }
         return $this;
     }
@@ -97,19 +127,28 @@ class Console
     /**
      * Registers a command
      * 
-     * @param string $command Command name to be used in the shell
      * @param string $class Associated class name, function name or Command instance
+     * @param string $alias Command name to be used in the shell
      * @return Console
      */
-    public function addCommand($command, $class)
+    public function addCommand($class, $alias = null)
     {
-        if (!class_exists($class) && !function_exists($class)) {
+        if (!function_exists($class) && !class_exists($class)) {
             throw new ConsoleException("'$class' must reference a class or a function");
         }
-        if (class_exists($class) && !is_subclass_of($class, 'ConsoleKit\Command')) {
-            throw new ConsoleException("'$class' must be a subclass of 'ConsoleKit\Command'");
+        $name = $class;
+        if (strtolower(substr($name, -7)) === 'command') {
+            $name = substr($name, 0, -7);
         }
-        $this->commands[$command] = $class;
+        if (class_exists($class, false)) {
+            if (!is_subclass_of($class, 'ConsoleKit\Command')) {
+                throw new ConsoleException("'$class' must be a subclass of 'ConsoleKit\Command'");
+            }
+            $name = Utils::dashized($name);
+        } else {
+            $name = strtolower(trim(str_replace('_', '-', $name), '-'));
+        }
+        $this->commands[$alias ?: $name] = $class;
         return $this;
     }
 
@@ -128,16 +167,33 @@ class Console
                 || strtolower(substr($file->getFilename(), -4)) !== '.php') {
                     continue;
             }
-            $name = substr($file->getFilename(), 0, -4);
-            $className = trim($namespace . '\\' . $name, '\\');
-            $name = strtolower(preg_replace('/(?<=[a-z])([A-Z])/', '-$1', $name));
-
             if ($includeFiles) {
                 include $file->getPathname();
             }
-            $this->addCommand($name, $className);
+            $className = trim($namespace . '\\' . substr($file->getFilename(), 0, -4), '\\');
+            $this->addCommand($className);
         }
         return $this;
+    }
+
+    /**
+     * @param string $name
+     * @return string
+     */
+    public function getCommand($name)
+    {
+        if (!isset($this->commands[$name])) {
+            throw new ConsoleException("Command '$name' does not exist");
+        }
+        return $this->commands[$name];
+    }
+
+    /**
+     * @return array
+     */
+    public function getCommands()
+    {
+        return $this->commands;
     }
     
     /**
@@ -146,16 +202,39 @@ class Console
      */
     public function run(array $argv = null)
     {
-        if ($argv === null) {
-            $argv = isset($_SERVER['argv']) ? array_slice($_SERVER['argv'], 1) : array();
-        }
+        try {
+            if ($argv === null) {
+                $argv = isset($_SERVER['argv']) ? array_slice($_SERVER['argv'], 1) : array();
+            }
 
-        list($args, $options) = $this->getOptionsParser()->parse($argv);
-        if (!count($args)) {
-            throw new ConsoleException("Missing command name");
+            list($args, $options) = $this->getOptionsParser()->parse($argv);
+            if (!count($args)) {
+                $this->textWriter->writeln(Colors::red("Missing command name"));
+                $args[] = $this->helpCommand;
+            }
+
+            $command = array_shift($args);
+            return $this->execute($command, $args, $options);
+
+        } catch (\Exception $e) {
+            $this->writeException($e);
+            if ($this->exitOnException) {
+                exit(1);
+            }
+            throw $e;
         }
-        
-        $command = array_shift($args);
+    }
+
+    /**
+     * Executes a command
+     *
+     * @param string $command
+     * @param array $args
+     * @param array $options
+     * @return mixed
+     */
+    public function execute($command, array $args = array(), array $options = array())
+    {
         if (!isset($this->commands[$command])) {
             throw new ConsoleException("Command '$command' does not exist");
         }
@@ -166,5 +245,24 @@ class Console
         }
         $instance = new $classname($this);
         return $instance->execute($args, $options);
+    }
+
+    /**
+     * Writes an error message to stderr
+     *
+     * @param \Exception $e
+     */
+    public function writeException(\Exception $e)
+    {
+        $text = sprintf("Uncaught exception '%s' with message '%s' in %s:%s\nStack trace:\n%s", 
+            get_class($e),
+            $e->getMessage(),
+            $e->getFile(),
+            $e->getLine(),
+            $e->getTraceAsString()
+        );
+
+        $box = new Widgets\Box($this->textWriter, $text);
+        $this->textWriter->writeln(Colors::colorize($box, Colors::RED | Colors::BOLD));
     }
 }

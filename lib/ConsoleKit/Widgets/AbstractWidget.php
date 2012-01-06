@@ -17,24 +17,38 @@
  * @link http://github.com/maximebf/ConsoleKit
  */
 
-namespace ConsoleKit;
+namespace ConsoleKit\Widgets;
 
-interface TextWriter
+use ConsoleKit\TextWriter;
+
+abstract class AbstractWidget
 {
-    const STDOUT = 'stdout';
-    const STDERR = 'stderr';
+    /** @var TextWriter */
+    protected $textWriter;
 
     /**
-     * Outputs text
-     * 
-     * @param string $text
+     * @param TextWriter $writer
      */
-    function write($test, $pipe = TextWriter::STDOUT);
+    public function __construct(TextWriter $writer)
+    {
+        $this->textWriter = $writer;
+    }
 
     /**
-     * Outputs text followed by a line break
-     * 
-     * @param string $text
+     * @param TextWriter $writer
+     * @return Dialog
      */
-    function writeln($test = '', $pipe = TextWriter::STDOUT);
+    public function setTextWriter(TextWriter $writer)
+    {
+        $this->textWriter = $writer;
+        return $this;
+    }
+
+    /**
+     * @return TextWriter
+     */
+    public function getTextWriter()
+    {
+        return $this->textWriter;
+    }
 }

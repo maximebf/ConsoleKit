@@ -25,7 +25,10 @@ namespace ConsoleKit;
 class TextFormater
 {
     /** @var int */
-    protected $indentWidth = 2;
+    public static $defaultIndentWidth = 1;
+
+    /** @var int */
+    protected $indentWidth = 1;
 
     /** @var int */
     protected $indent = 0;
@@ -44,6 +47,7 @@ class TextFormater
      */
     public function __construct(array $options = array())
     {
+        $this->indentWidth = self::$defaultIndentWidth;
         $this->setOptions($options);
     }
 
@@ -175,18 +179,12 @@ class TextFormater
      */
     public function format($text)
     {
-        $prefix = '';
-        $indent = $this->indent;
-
-        if (!empty($this->quote)) {
-            $prefix = (string) $this->quote;
-            $indent -= strlen($prefix);
-            if ($indent < 0) {
-                $indent = 0;
-            }
+        $lines = explode("\n", $text);
+        foreach ($lines as &$line) {
+            $line = ((string) $this->quote)
+                  . str_repeat(' ', $this->indent * $this->indentWidth) 
+                  . $line;
         }
-        $prefix .= str_repeat(' ', $indent * $this->indentWidth);
-        $text = $prefix . $text;
-        return Colors::colorize($text, $this->fgColor, $this->bgColor);
+        return Colors::colorize(implode("\n", $lines), $this->fgColor, $this->bgColor);
     }
 }

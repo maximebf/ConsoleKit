@@ -20,7 +20,7 @@ You will also need to configure a class autoloader. You can use the following on
 
     <?php
 
-    class HelloWorldCommand extends ConsoleKit\Command
+    class HelloCommand extends ConsoleKit\Command
     {
         public function execute(array $args, array $options = array())
         {
@@ -28,5 +28,6 @@ You will also need to configure a class autoloader. You can use the following on
         }
     }
 
-    $console = new ConsoleKit\Console(array('hello' => 'HelloWorldCommand'));
+    $console = new ConsoleKit\Console();
+    $console->addCommand('HelloCommand');
     $console->run();

@@ -19,20 +19,23 @@
 
 namespace ConsoleKit\Widgets;
 
+use ConsoleKit\TextWriter,
+    ConsoleKit\ConsoleException;
+
 /**
- * Renders a progress bar
+ * Progress bar
  *
  * <code>
  * $total = 100;
- * $progress = new ProgressBar($total);
+ * $progress = new ProgressBar($textWriter, $total);
  * for ($i = 0; $i < $total; $i++) {
- *     $this->write($progress->incr());
- *     usleep(100000);
+ *     $progress->incr();
+ *     usleep(10000);
  * }
- * $this->writeln();
+ * $progress->stop();
  * </code>
  */
-class ProgressBar
+class ProgressBar extends AbstractWidget
 {
     /** @var int */
     protected $value = 0;
@@ -43,17 +46,22 @@ class ProgressBar
     /** @var int */
     protected $size = 0;
 
+    /** @var bool */
+    protected $showRemainingTime = true;
+
     /** @var int */
     protected $startTime;
 
     /**
+     * @param TextWriter $writer
      * @param int $total
      * @param int $size
-     * @param array $textOptions
      */
-    public function __construct($total = 100, $size = 50)
+    public function __construct(TextWriter $writer = null, $total = 100, $size = 50, $showRemainingTime = true)
     {
+        $this->textWriter = $writer;
         $this->size = $size;
+        $this->showRemainingTime = $showRemainingTime;
         $this->start($total);
     }
 
@@ -76,15 +84,19 @@ class ProgressBar
     }
 
     /**
-     * @param int $total
-     * @return ProgressBar
+     * @param bool $show
      */
-    public function start($total = 100)
+    public function setShowRemainingTime($show = true)
     {
-        $this->value = 0;
-        $this->total = $total;
-        $this->startTime = time();
-        return $this;
+        $this->showRemainingTime = $show;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getShowRemainingTime()
+    {
+        return $this->showRemainingTime;
     }
 
     /**
@@ -104,7 +116,19 @@ class ProgressBar
     }
 
     /**
-     * Increments the value
+     * @param int $total
+     * @return ProgressBar
+     */
+    public function start($total = 100)
+    {
+        $this->value = 0;
+        $this->total = $total;
+        $this->startTime = time();
+        return $this;
+    }
+
+    /**
+     * Increments the value and calls {@see write()}
      *
      * @param int $increment
      * @return ProgressBar
@@ -112,6 +136,18 @@ class ProgressBar
     public function incr($increment = 1)
     {
         $this->value += $increment;
+        $this->write();
+        return $this;
+    }
+
+    /**
+     * Writes a new line
+     *
+     * @return ProgressBar
+     */
+    public function stop()
+    {
+        $this->textWriter->writeln();
         return $this;
     }
 
@@ -123,8 +159,6 @@ class ProgressBar
     public function render()
     {
         $percentage = (double) ($this->value / $this->total);
-        $speed = (time() - $this->startTime) / $this->value;
-        $remaining = number_format(round($speed * ($this->total - $this->value), 2), 2);
 
         $progress = floor($percentage * $this->size);
         $output = "\r[" . str_repeat('=', $progress);
@@ -133,8 +167,29 @@ class ProgressBar
         } else {
             $output .= '=';
         }
-        $output .= sprintf('] %s%% %s/%s %s sec remaining', round($percentage * 100, 0), $this->value, $this->total, $remaining);
+        $output .= sprintf('] %s%% %s/%s', round($percentage * 100, 0), $this->value, $this->total);
+
+        if ($this->showRemainingTime) {
+            $speed = (time() - $this->startTime) / $this->value;
+            $remaining = number_format(round($speed * ($this->total - $this->value), 2), 2);
+            $output .= "$remaining sec remaining";
+        }
+
         return $output;
+    }
+
+    /**
+     * Writes the rendered progress bar to the text writer
+     *
+     * @return ProgressBar
+     */
+    public function write()
+    {
+        if ($this->textWriter === null) {
+            throw new ConsoleException('No TextWriter object specified');
+        }
+        $this->textWriter->write($this->render());
+        return $this;
     }
 
     public function __toString()

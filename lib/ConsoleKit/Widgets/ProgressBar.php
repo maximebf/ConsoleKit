@@ -17,19 +17,19 @@
  * @link http://github.com/maximebf/ConsoleKit
  */
 
-namespace ConsoleKit;
+namespace ConsoleKit\Widgets;
 
 /**
- * Displays a progress bar
+ * Renders a progress bar
  *
  * <code>
  * $total = 100;
  * $progress = new ProgressBar($total);
  * for ($i = 0; $i < $total; $i++) {
- *     $progress->incr()->write();
+ *     $this->write($progress->incr());
  *     usleep(100000);
  * }
- * $progress->stop();
+ * $this->writeln();
  * </code>
  */
 class ProgressBar
@@ -43,9 +43,6 @@ class ProgressBar
     /** @var int */
     protected $size = 0;
 
-    /** @var array */
-    protected $textOptions = array();
-
     /** @var int */
     protected $startTime;
 
@@ -54,10 +51,9 @@ class ProgressBar
      * @param int $size
      * @param array $textOptions
      */
-    public function __construct($total = 100, $size = 50, array $textOptions = array())
+    public function __construct($total = 100, $size = 50)
     {
         $this->size = $size;
-        $this->textOptions = $textOptions;
         $this->start($total);
     }
 
@@ -77,24 +73,6 @@ class ProgressBar
     public function getSize()
     {
         return $this->size;
-    }
-
-    /**
-     * @param array $options
-     * @return ProgressBar
-     */
-    public function setTextOptions(array $options)
-    {
-        $this->textOptions = $options;
-        return $this;
-    }
-
-    /**
-     * @return array
-     */
-    public function getTextOptions()
-    {
-        return $this->textOptions;
     }
 
     /**
@@ -138,14 +116,6 @@ class ProgressBar
     }
 
     /**
-     * Needs to be called before printing other text
-     */
-    public function stop()
-    {
-        echo "\n";
-    }
-
-    /**
      * Generates the text to write for the current values
      *
      * @return string
@@ -164,15 +134,7 @@ class ProgressBar
             $output .= '=';
         }
         $output .= sprintf('] %s%% %s/%s %s sec remaining', round($percentage * 100, 0), $this->value, $this->total, $remaining);
-        return Text::format($output, $this->textOptions);
-    }
-
-    /**
-     * Echos the renderer text
-     */
-    public function write()
-    {
-        echo $this->render();
+        return $output;
     }
 
     public function __toString()

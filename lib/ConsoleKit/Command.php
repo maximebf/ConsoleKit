@@ -19,6 +19,8 @@
 
 namespace ConsoleKit;
 
+use Closure;
+
 /**
  * Base class for commands
  *
@@ -50,6 +52,25 @@ namespace ConsoleKit;
  */
 abstract class Command
 {
+    /** @var Console */
+    protected $console;
+
+    /**
+     * @param Console $console
+     */
+    public function __construct(Console $console)
+    {
+        $this->console = $console;
+    }
+
+    /** 
+     * @return Console
+     */
+    public function getConsole()
+    {
+        return $this->console;
+    }
+
     /**
      * If not overriden, will execute the command specified
      * as the first argument
@@ -75,30 +96,62 @@ abstract class Command
         
         return call_user_func(array($this, $method), $args, $options);
     }
+
+    /**
+     * Formats text using a {@see TextFormater}
+     *
+     * @param string $text
+     * @param array $formatOptions
+     * @return string
+     */
+    public function format($text, array $formatOptions = array())
+    {
+        $formater = new TextFormater($formatOptions);
+        return $formater->format($text);
+    }
+
+    /**
+     * Executes the closure with a {@see FormatedWriter} object as the first
+     * argument, initialized with the $formatOptions array
+     *
+     * <code>
+     * $this->context(array('quote' => ' * '), function($f) {
+     *     $f->writeln('quoted text');
+     * })
+     * </code>
+     *
+     * @param array $formatOptions
+     * @param Closure $closure
+     */
+    public function context(array $formatOptions, Closure $closure)
+    {
+        $formater = new FormatedWriter($this->console->getTextWriter(), $formatOptions);
+        return $closure($formater);
+    }
     
     /**
-     * Prints some text
+     * Writes some text to the text writer
      * 
      * @param string $text
-     * @param array $options
+     * @param array $formatOptions
      * @return Command
      */
-    public function write($text, array $options = array())
+    public function write($text, array $formatOptions = array())
     {
-        Text::write($text, $options);
+        $this->console->getTextWriter()->write($this->format($text, $formatOptions));
         return $this;
     }
     
     /**
-     * Prints a line of text
+     * Writes a line of text
      * 
+     * @see write()
      * @param string $text
-     * @param array $options
+     * @param array $formatOptions
      * @return Command
      */
-    public function writeln($text, array $options = array())
+    public function writeln($text, array $formatOptions = array())
     {
-        Text::writeln($text, $options);
-        return $this;
+        return $this->write("$text\n", $formatOptions);
     }
 }

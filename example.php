@@ -34,9 +34,11 @@ class SayHelloCommand extends Command
     {
         $textOptions = array();
         if (isset($options['color'])) {
-            $textOptions['fgcolor'] = strtolower($options['color']);
+            $textOptions['fgcolor'] = $options['color'];
         }
-        $this->writeln(sprintf('hello %s!', $args[0]), $textOptions);
+        $this->context($textOptions, function($c) use ($args) {
+            $c->writeln(sprintf('hello %s!', $args[0]));
+        });
     }
 }
 

@@ -27,18 +27,20 @@ class Console
     /** @var array */
     protected $commands = array();
 
-    /**
-     * @var OptionsParser
-     */
+    /** @var OptionsParser */
     protected $optionsParser;
+
+    /** @var TextWriter */
+    protected $textWriter;
 
     /**
      * @param array $commands
      */
-    public function __construct(array $commands = array(), OptionsParser $parser = null)
+    public function __construct(array $commands = array(), OptionsParser $parser = null, TextWriter $writer = null)
     {
-        $this->addCommands($commands);
         $this->optionsParser = $parser ?: new DefaultOptionsParser();
+        $this->textWriter = $writer ?: new EchoTextWriter();
+        $this->addCommands($commands);
     }
 
     /**
@@ -57,6 +59,24 @@ class Console
     public function getOptionsParser()
     {
         return $this->optionsParser;
+    }
+
+    /**
+     * @param TextWriter $writer
+     * @return Console
+     */
+    public function setTextWriter(TextWriter $writer)
+    {
+        $this->textWriter = $writer;
+        return $this;
+    }
+
+    /**
+     * @return TextWriter
+     */
+    public function getTextWriter()
+    {
+        return $this->textWriter;
     }
 
     /**
@@ -142,9 +162,9 @@ class Console
         
         $classname = $this->commands[$command];
         if (function_exists($classname)) {
-            return call_user_func($classname, $args, $options);
+            return call_user_func($classname, $args, $options, $this);
         }
-        $instance = new $classname();
+        $instance = new $classname($this);
         return $instance->execute($args, $options);
     }
 }

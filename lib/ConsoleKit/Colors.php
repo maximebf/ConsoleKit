@@ -75,7 +75,10 @@ class Colors
         if ($fgcolor) {
             $colors .= self::getFgColorString(self::getColorCode($fgcolor));
         }
-        return $colors . $text . self::RESET;
+        if ($colors) {
+            $text = $colors . $text . self::RESET;
+        }
+        return $text;
     }
 
     /**

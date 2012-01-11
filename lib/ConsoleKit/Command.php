@@ -90,7 +90,7 @@ abstract class Command
             throw new ConsoleException("Not enough arguments");
         }
         
-        $command = Utils::camelize(array_shift($args));
+        $command = ucfirst(Utils::camelize(array_shift($args)));
         $method = "execute$command";
         
         if (!method_exists($this, $method)) {
@@ -132,7 +132,7 @@ abstract class Command
      */
     public function context(array $formatOptions, Closure $closure)
     {
-        $formater = new FormatedWriter($this->console->getTextWriter(), $formatOptions);
+        $formater = new FormatedWriter($this->console, $formatOptions);
         return $closure($formater);
     }
     
@@ -146,7 +146,7 @@ abstract class Command
      */
     public function write($text, $formatOptions = array(), $pipe = TextWriter::STDOUT)
     {
-        $this->console->getTextWriter()->write($this->format($text, $formatOptions), $pipe);
+        $this->console->write($this->format($text, $formatOptions), $pipe);
         return $this;
     }
 

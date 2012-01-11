@@ -58,6 +58,7 @@ class FormatedWriter extends TextFormater implements TextWriter
     /**
      * Writes some text to the text writer
      * 
+     * @see TextWriter::write()
      * @param string $text
      * @param array $formatOptions
      * @return Command
@@ -71,13 +72,14 @@ class FormatedWriter extends TextFormater implements TextWriter
     /**
      * Writes a line of text
      * 
-     * @see write()
+     * @see TextWriter::writeln()
      * @param string $text
      * @param array $formatOptions
      * @return Command
      */
     public function writeln($text = '', $pipe = TextWriter::STDOUT)
     {
-        return $this->write("$text\n", $pipe);
+        $this->textWriter->writeln($this->format($text), $pipe);
+        return $this;
     }
 }

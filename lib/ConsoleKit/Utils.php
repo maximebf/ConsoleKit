@@ -45,7 +45,7 @@ class Utils
      * @param array $dirs
      * @return string
      */
-    public static function find($filename, array $dirs = array())
+    public static function find($filename, $dirs = array())
     {
         if (empty($dirs)) {
             if ($filename = realpath($filename)) {
@@ -138,7 +138,7 @@ class Utils
      */
     public static function camelize($string)
     {
-        return str_replace(' ', '', ucwords(str_replace('-', ' ', $string)));
+        return lcfirst(str_replace(' ', '', ucwords(str_replace('-', ' ', $string))));
     }
 
     /**

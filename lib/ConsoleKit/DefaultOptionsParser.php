@@ -26,7 +26,7 @@ namespace ConsoleKit;
  *   --key=value
  *   --key
  *   -a
- *   -ab (equivalent to -a -b)
+ *   -ab (equivalent of -a -b)
  *
  * When an option has no value, true will be used.
  * If "--" is detected, all folowing values will be treated as a single argument

@@ -1,10 +1,6 @@
 <?php
 
-set_include_path(__DIR__ . '/lib' . PATH_SEPARATOR . get_include_path());
-spl_autoload_register(function($className) {
-    $filename = str_replace('\\', DIRECTORY_SEPARATOR, trim($className, '\\')) . '.php';
-    require_once $filename;
-});
+include __DIR__ . '/tests/bootstrap.php';
 
 use ConsoleKit\Console,
     ConsoleKit\Command,
@@ -54,7 +50,7 @@ class SayCommand extends Command
     {
         $name = 'unknown';
         if (empty($args)) {
-            $dialog = new Dialog($this->console->getTextWriter());
+            $dialog = new Dialog($this->console);
             $name = $dialog->ask('What is your name?', $name);
         } else {
             $name = $args[0];
@@ -79,11 +75,11 @@ class SayCommand extends Command
  * @opt total Number of iterations
  * @opt usleep Waiting time in microsecond between each iteration
  */
-function progress_command($args, $options, $console)
+function progress($args, $options, $console)
 {
     $total = isset($options['total']) ? $options['total'] : 100;
     $usleep = isset($options['usleep']) ? $options['usleep'] : 10000;
-    $progress = new ProgressBar($console->getTextWriter(), $total);
+    $progress = new ProgressBar($console, $total);
     for ($i = 0; $i < $total; $i++) {
         $progress->incr();
         usleep($usleep);
@@ -95,7 +91,7 @@ $console = new Console(array(
     'hello' => 'HelloWorldCommand',
     'SayHelloCommand',
     'SayCommand',
-    'progress_command'
+    'progress'
 ));
 
 $console->run();

@@ -19,10 +19,13 @@
  
 namespace ConsoleKit;
 
+use Closure,
+    DirectoryIterator;
+
 /**
  * Registry of available commands and command runner
  */
-class Console
+class Console implements TextWriter
 {
     /** @var array */
     protected $commands = array();
@@ -49,8 +52,10 @@ class Console
     {
         $this->optionsParser = $parser ?: new DefaultOptionsParser();
         $this->textWriter = $writer ?: new StdTextWriter();
-        $this->addCommand($this->helpCommandClass, $this->helpCommand);
-        $this->addCommands($commands);
+        if ($this->helpCommandClass) {
+            $this->addCommand($this->helpCommandClass, $this->helpCommand);
+            $this->addCommands($commands);
+        }
     }
 
     /**
@@ -127,28 +132,42 @@ class Console
     /**
      * Registers a command
      * 
-     * @param string $class Associated class name, function name or Command instance
+     * @param callback $callback Associated class name, function name, Command instance or closure
      * @param string $alias Command name to be used in the shell
      * @return Console
      */
-    public function addCommand($class, $alias = null)
+    public function addCommand($callback, $alias = null)
     {
-        if (!function_exists($class) && !class_exists($class)) {
-            throw new ConsoleException("'$class' must reference a class or a function");
-        }
-        $name = $class;
-        if (strtolower(substr($name, -7)) === 'command') {
-            $name = substr($name, 0, -7);
-        }
-        if (class_exists($class, false)) {
-            if (!is_subclass_of($class, 'ConsoleKit\Command')) {
-                throw new ConsoleException("'$class' must be a subclass of 'ConsoleKit\Command'");
+        $name = '';
+        if (is_string($callback)) {
+            $name = $callback;
+            if (function_exists($callback)) {
+                $name = strtolower(trim(str_replace('_', '-', $name), '-'));
+            } else if (class_exists($callback)) {
+                if (!is_subclass_of($callback, 'ConsoleKit\Command')) {
+                    throw new ConsoleException("'$callback' must be a subclass of 'ConsoleKit\Command'");
+                }
+                if (substr($name, -7) === 'Command') {
+                    $name = substr($name, 0, -7);
+                }
+                $name = Utils::dashized(basename(str_replace('\\', '/', $name)));
+            } else {
+                throw new ConsoleException("'$callback' must reference a class or a function");
             }
-            $name = Utils::dashized($name);
-        } else {
-            $name = strtolower(trim(str_replace('_', '-', $name), '-'));
+        } else if (is_object($callback) && !($callback instanceof Closure)) {
+            $classname = get_class($callback);
+            if (!($callback instanceof Command)) {
+                throw new ConsoleException("'$classname' must inherit from 'ConsoleKit\Command'");
+            }
+            if (substr($classname, -7) === 'Command') {
+                $classname = substr($classname, 0, -7);
+            }
+            $name = Utils::dashized(basename(str_replace('\\', '/', $classname)));
+        } else if (!$alias) {
+            throw new ConsoleException("Commands using closures must have an alias");
         }
-        $this->commands[$alias ?: $name] = $class;
+
+        $this->commands[$alias ?: $name] = $callback;
         return $this;
     }
 
@@ -163,14 +182,15 @@ class Console
     public function addCommandsFromDir($dir, $namespace = '', $includeFiles = false)
     {
         foreach (new DirectoryIterator($dir) as $file) {
-            if ($file->isDir() || substr($file->getFilename(), 0, 1) === '.' 
-                || strtolower(substr($file->getFilename(), -4)) !== '.php') {
+            $filename = $file->getFilename();
+            if ($file->isDir() || substr($filename, 0, 1) === '.' || strlen($filename) <= 11 
+                || strtolower(substr($filename, -11)) !== 'command.php') {
                     continue;
             }
             if ($includeFiles) {
                 include $file->getPathname();
             }
-            $className = trim($namespace . '\\' . substr($file->getFilename(), 0, -4), '\\');
+            $className = trim($namespace . '\\' . substr($filename, 0, -4), '\\');
             $this->addCommand($className);
         }
         return $this;
@@ -239,18 +259,47 @@ class Console
             throw new ConsoleException("Command '$command' does not exist");
         }
         
-        $classname = $this->commands[$command];
-        if (function_exists($classname)) {
-            return call_user_func($classname, $args, $options, $this);
+        $callback = $this->commands[$command];
+        if (is_callable($callback)) {
+            return call_user_func($callback, $args, $options, $this);
         }
-        $instance = new $classname($this);
+        $instance = new $callback($this);
         return $instance->execute($args, $options);
+    }
+    
+    /**
+     * Writes some text to the text writer
+     * 
+     * @see TextWriter::write()
+     * @param string $text
+     * @param array $formatOptions
+     * @return Console
+     */
+    public function write($text, $pipe = TextWriter::STDOUT)
+    {
+        $this->textWriter->write($text, $pipe);
+        return $this;
+    }
+    
+    /**
+     * Writes a line of text
+     * 
+     * @see TextWriter::writeln()
+     * @param string $text
+     * @param array $formatOptions
+     * @return Console
+     */
+    public function writeln($text = '', $pipe = TextWriter::STDOUT)
+    {
+        $this->textWriter->writeln($text, $pipe);
+        return $this;
     }
 
     /**
      * Writes an error message to stderr
      *
      * @param \Exception $e
+     * @return Console
      */
     public function writeException(\Exception $e)
     {
@@ -264,5 +313,6 @@ class Console
 
         $box = new Widgets\Box($this->textWriter, $text);
         $this->textWriter->writeln(Colors::colorize($box, Colors::RED | Colors::BOLD));
+        return $this;
     }
 }

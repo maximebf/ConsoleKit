@@ -27,9 +27,6 @@ use Closure,
  */
 class Console implements TextWriter
 {
-    /** @var array */
-    protected $commands = array();
-
     /** @var OptionsParser */
     protected $optionsParser;
 
@@ -44,6 +41,12 @@ class Console implements TextWriter
 
     /** @var string */
     protected $helpCommandClass = 'ConsoleKit\HelpCommand';
+
+    /** @var array */
+    protected $commands = array();
+
+    /** @var string */
+    protected $defaultCommand;
 
     /**
      * @param array $commands
@@ -134,9 +137,10 @@ class Console implements TextWriter
      * 
      * @param callback $callback Associated class name, function name, Command instance or closure
      * @param string $alias Command name to be used in the shell
+     * @param bool $default True to set the command as the default one
      * @return Console
      */
-    public function addCommand($callback, $alias = null)
+    public function addCommand($callback, $alias = null, $default = false)
     {
         $name = '';
         if (is_string($callback)) {
@@ -167,7 +171,11 @@ class Console implements TextWriter
             throw new ConsoleException("Commands using closures must have an alias");
         }
 
-        $this->commands[$alias ?: $name] = $callback;
+        $name = $alias ?: $name;
+        $this->commands[$name] = $callback;
+        if ($default) {
+            $this->defaultCommand = $name;
+        }
         return $this;
     }
 
@@ -198,6 +206,15 @@ class Console implements TextWriter
 
     /**
      * @param string $name
+     * @return bool
+     */
+    public function hasCommand($name)
+    {
+        return isset($this->commands[$name]);
+    }
+
+    /**
+     * @param string $name
      * @return string
      */
     public function getCommand($name)
@@ -215,6 +232,26 @@ class Console implements TextWriter
     {
         return $this->commands;
     }
+
+    /**
+     * @param string $name
+     * @return Console
+     */
+    public function setDefaultCommand($name = null)
+    {
+        if ($name !== null && !isset($this->commands[$name])) {
+            throw new ConsoleException("Command '$name' does not exist");
+        }
+        $this->defaultCommand = $name;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDefaultCommand()
+    {
+        return $this->defaultCommand;
+    }
     
     /**
      * @param array $args
@@ -229,8 +266,12 @@ class Console implements TextWriter
 
             list($args, $options) = $this->getOptionsParser()->parse($argv);
             if (!count($args)) {
-                $this->textWriter->writeln(Colors::red("Missing command name"));
-                $args[] = $this->helpCommand;
+                if ($this->defaultCommand) {
+                    $args[] = $this->defaultCommand;
+                } else {
+                    $this->textWriter->writeln(Colors::red("Missing command name"));
+                    $args[] = $this->helpCommand;
+                }
             }
 
             $command = array_shift($args);
@@ -253,8 +294,9 @@ class Console implements TextWriter
      * @param array $options
      * @return mixed
      */
-    public function execute($command, array $args = array(), array $options = array())
+    public function execute($command = null, array $args = array(), array $options = array())
     {
+        $command = $command ?: $this->defaultCommand;
         if (!isset($this->commands[$command])) {
             throw new ConsoleException("Command '$command' does not exist");
         }

@@ -70,4 +70,11 @@ class ConsoleTest extends ConsoleKitTestCase
         $this->console->addCommand('ConsoleKit\Tests\TestCommand');
         $this->console->run(array('test'));
     }
+
+    public function testDefaultCommand()
+    {
+        $this->expectOutputString("foobar\n");
+        $this->console->addCommand('ConsoleKit\Tests\TestCommand', null, true);
+        $this->console->run(array());
+    }
 }

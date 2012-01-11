@@ -116,11 +116,11 @@ Check out [example.php](https://github.com/maximebf/ConsoleKit/blob/master/examp
 
 ### Colors
 
-The *ConsoleKit\Colors::colorize()* method provides an easy way colorize a text. 
-Colors are defined as either string or integer (through constants of the *Colors* class).  
+The *ConsoleKit\Colors::colorize()* method provides an easy way to colorize a text. 
+Colors are defined as either a string or an integer (through constants of the *Colors* class).  
 Available colors: black, red, green, yellow, blue, magenta, cyan, white.
 
-Foreground colors are also available in a "bold" variant. Suffixed the color name with "+bold" or use the OR bit operator with constant.
+Foreground colors are also available in a "bold" variant. Suffix the color name with "+bold" or use the OR bit operator with constants.
 
     echo Colors::colorize('my red text', Colors::RED);
     echo Colors::colorize('my red text', 'red');
@@ -135,7 +135,7 @@ Foreground colors are also available in a "bold" variant. Suffixed the color nam
 The *ConsoleKit\TextFormater* class allows you to format text using the following options:
 
  -  indentation using *setIndent()* or the *indent* option
- -  quote using *setQuote()* or the *quote* option
+ -  quoting using *setQuote()* or the *quote* option
  -  foreground color using *setFgColor()* or the *fgcolor* option
  -  background color using *setBgColor()* or the *bgcolor* option
 
@@ -153,7 +153,6 @@ Used to interact with the user
 
     $dialog = new ConsoleKit\Dialog($console);
     $name = $dialog->ask('What is your name?');
-    
     if ($dialog->confirm('Are you sure?')) {
         $console->writeln("hello $name");
     }

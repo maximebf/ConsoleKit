@@ -81,7 +81,7 @@ and override the *execute()* method.
         }
     }
 
-The *ConsoleKit\Command* class offers helpers method, check it out for more info.
+The *ConsoleKit\Command* class offers helper methods, check it out for more info.
 
 ### Registering commands
 
@@ -104,6 +104,13 @@ Simply call the *run()* method of the console object
 
     $console->run();
     $console->run(array('custom arg1', 'custom arg2')); // overrides $_SERVER['argv']
+
+### Automatic help generation
+
+The *help* command is automatically registered and provides help about available methods based on doc comments.  
+Check out [example.php](https://github.com/maximebf/ConsoleKit/blob/master/example.php) for example of available tags
+
+    $ php myscript.php help
 
 ## Formating text
 

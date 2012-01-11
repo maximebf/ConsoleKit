@@ -20,15 +20,15 @@
 namespace ConsoleKit;
 
 /**
- * Simple writer that prints text using php's "echo()" function
- *
- * Note: Pipes are ignored
+ * Text writer that writes to stdout or stderr
  */
-class EchoTextWriter implements TextWriter
+class StdTextWriter implements TextWriter
 {
     public function write($text, $pipe = TextWriter::STDOUT)
     {
-        echo $text;
+        $f = fopen('php://' . $pipe, 'w');
+        fwrite($f, $text);
+        fclose($f);
     }
 
     public function writeln($text = '', $pipe = TextWriter::STDOUT)

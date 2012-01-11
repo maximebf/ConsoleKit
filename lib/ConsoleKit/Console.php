@@ -48,7 +48,7 @@ class Console
     public function __construct(array $commands = array(), OptionsParser $parser = null, TextWriter $writer = null)
     {
         $this->optionsParser = $parser ?: new DefaultOptionsParser();
-        $this->textWriter = $writer ?: new EchoTextWriter();
+        $this->textWriter = $writer ?: new StdTextWriter();
         $this->addCommand($this->helpCommandClass, $this->helpCommand);
         $this->addCommands($commands);
     }

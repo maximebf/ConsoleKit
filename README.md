@@ -2,22 +2,6 @@
 
 PHP 5.3+ library to create command line utilities
 
-## Installation
-
-Download and copy the lib/ConsoleKit folder into php's include path.
-You can also add the folder to your include path using *set\_include\_path()*:
-
-    set_include_path('/path/to/lib' . PATH_SEPARATOR . get_include_path());
-
-You will also need to configure a class autoloader. You can use the following one:
-
-    spl_autoload_register(function($className) {
-        if (substr($className, 0, 10) === 'ConsoleKit') {
-            $filename = str_replace('\\', DIRECTORY_SEPARATOR, trim($className, '\\')) . '.php';
-            require_once $filename;
-        }
-    });
-
 ## Example
 
 In *cli.php*:
@@ -42,6 +26,22 @@ In the shell:
     hello world!
 
 More examples in [example.php](https://github.com/maximebf/ConsoleKit/blob/master/example.php)
+
+## Installation
+
+Download and copy the lib/ConsoleKit folder into php's include path.
+You can also add the folder to your include path using *set\_include\_path()*:
+
+    set_include_path('/path/to/lib' . PATH_SEPARATOR . get_include_path());
+
+You will also need to configure a class autoloader. You can use the following one:
+
+    spl_autoload_register(function($className) {
+        if (substr($className, 0, 10) === 'ConsoleKit') {
+            $filename = str_replace('\\', DIRECTORY_SEPARATOR, trim($className, '\\')) . '.php';
+            require_once $filename;
+        }
+    });
 
 ## Usage
 

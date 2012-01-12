@@ -28,7 +28,8 @@ namespace ConsoleKit;
  *   -a
  *   -ab (equivalent of -a -b)
  *
- * When an option has no value, true will be used.
+ * When an option has no value, true will be used. If multiple key/value pairs
+ * with the same key are specified, the "key" value will be an array containing all the values.
  * If "--" is detected, all folowing values will be treated as a single argument
  *
  */
@@ -58,7 +59,14 @@ class DefaultOptionsParser implements OptionsParser
                     $key = substr($arg, 2, $sep - 2);
                     $value = substr($arg, $sep + 1);
                 }
-                $options[$key] = $value;
+                if (array_key_exists($key, $options)) {
+                    if (!is_array($options[$key])) {
+                        $options[$key] = array($options[$key]);
+                    }
+                    $options[$key][] = $value;
+                } else {
+                    $options[$key] = $value;
+                }
             } else if (substr($arg, 0, 1) === '-') {
                 foreach (str_split(substr($arg, 1)) as $key) {
                     $options[$key] = true;

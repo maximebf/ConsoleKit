@@ -29,6 +29,12 @@ class DefaultOptionsParserTest extends ConsoleKitTestCase
         $this->assertEquals('bar', $options['foo']);
         $this->assertArrayHasKey('foobar', $options);
 
+        list($args, $options) = $parser->parse(array('--foo=bar', '--foo=baz'));
+        $this->assertArrayHasKey('foo', $options);
+        $this->assertInternalType('array', $options['foo']);
+        $this->assertContains('bar', $options['foo']);
+        $this->assertContains('baz', $options['foo']);
+
         list($args, $options) = $parser->parse(array('-a', '-bc'));
         $this->assertCount(3, $options);
         $this->assertArrayHasKey('a', $options);

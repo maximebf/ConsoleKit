@@ -55,7 +55,8 @@ Items can be of the form:
  -  -a
  -  -ab (equivalent of -a -b)
 
-When an option has no value, true will be used.
+When an option has no value, true will be used. If multiple key/value pairs
+with the same key are specified, the "key" value will be an array containing all the values.  
 If "--" is detected, all folowing values will be treated as a single argument
 
 Example: the string "-a -bc --longopt --key=value arg1 arg2 -- --any text" will produce the following two arrays:

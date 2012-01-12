@@ -20,7 +20,9 @@
 namespace ConsoleKit;
 
 use Closure,
-    DirectoryIterator;
+    DirectoryIterator,
+    ReflectionFunction,
+    ReflectionMethod;
 
 /**
  * Registry of available commands and command runner
@@ -303,10 +305,17 @@ class Console implements TextWriter
         
         $callback = $this->commands[$command];
         if (is_callable($callback)) {
-            return call_user_func($callback, $args, $options, $this);
+            $params = array($args, $options);
+            if (is_string($callback)) {
+                $params = Utils::computeFuncParams(new ReflectionFunction($callback), $args, $options);
+            }
+            $params[] = $this;
+            return call_user_func($callback, $params);
         }
-        $instance = new $callback($this);
-        return $instance->execute($args, $options);
+
+        $method = new ReflectionMethod($callback, 'execute');
+        $params = Utils::computeFuncParams($method, $args, $options);
+        return $method->invokeArgs(new $callback($this), $params);
     }
     
     /**

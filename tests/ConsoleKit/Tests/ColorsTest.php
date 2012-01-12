@@ -11,6 +11,7 @@ class ColorsTest extends ConsoleKitTestCase
         $this->assertEquals("\033[31mred\033[0m", Colors::colorize('red', Colors::RED));
         $this->assertEquals("\033[1;31mred\033[0m", Colors::colorize('red', Colors::RED | Colors::BOLD));
         $this->assertEquals("\033[43m\033[31mred\033[0m", Colors::colorize('red', Colors::RED, Colors::YELLOW));
+        $this->assertEquals("\033[31mred\033[0m", Colors::red('red'));
     }
 
     public function testGetColorCode()

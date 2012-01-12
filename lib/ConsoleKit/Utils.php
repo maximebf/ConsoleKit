@@ -19,6 +19,8 @@
 
 namespace ConsoleKit;
 
+use ReflectionFunctionAbstract;
+
 class Utils
 {
     /**
@@ -150,5 +152,47 @@ class Utils
     public static function dashized($string)
     {
         return strtolower(preg_replace('/(?<=[a-z])([A-Z])/', '-$1', $string));
+    }
+
+    /**
+     * Creates an array of parameters according to the function definition
+     * 
+     * @param ReflectionFunctionAbstract $reflection
+     * @param array $args
+     * @param array $options
+     * @param bool $needTagInDocComment Whether the compute-params tag must be present in the doc comment
+     * @return array
+     */
+    public static function computeFuncParams(ReflectionFunctionAbstract $reflection, array $args, array $options, $needTagInDocComment = true)
+    {
+        if ($needTagInDocComment && !preg_match('/@compute-params/', $reflection->getDocComment())) {
+            return array($args, $options);
+        }
+
+        $nbRequiredParams = $reflection->getNumberOfRequiredParameters();
+        if (count($args) < $nbRequiredParams) {
+            throw new ConsoleException("Not enough parameters in '" . $reflection->getName() . "'");
+        }
+
+        $params = $args;
+        if (count($args) > $nbRequiredParams) {
+            $params = array_slice($args, 0, $nbRequiredParams);
+            $args = array_slice($args, $nbRequiredParams);
+        }
+
+        foreach ($reflection->getParameters() as $param) {
+            if ($param->isOptional() && substr($param->getName(), 0, 1) !== '_') {
+                if (array_key_exists($param->getName(), $options)) {
+                    $params[] = $options[$param->getName()];
+                    unset($options[$param->getName()]);
+                } else {
+                    $params[] = $param->getDefaultValue();
+                }
+            }
+        }
+
+        $params[] = $args;
+        $params[] = $options;
+        return $params;
     }
 }

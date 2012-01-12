@@ -12,6 +12,7 @@ class ConsoleTest extends ConsoleKitTestCase
     {
         $this->console = new Console();
         $this->console->setTextWriter(new EchoTextWriter());
+        $this->console->setExitOnException(false);
     }
 
     public function testAddCommand()
@@ -59,21 +60,51 @@ class ConsoleTest extends ConsoleKitTestCase
 
     public function testExecute()
     {
-        $this->expectOutputString("foobar\n");
+        $this->expectOutputString("hello unknown!\n");
         $this->console->addCommand('ConsoleKit\Tests\TestCommand');
         $this->console->execute('test');
     }
 
+    public function testExecuteWithArgs()
+    {
+        $this->expectOutputString("hello foo bar!\n");
+        $this->console->addCommand('ConsoleKit\Tests\TestCommand');
+        $this->console->execute('test', array('foo', 'bar'));
+    }
+
+    public function testExecuteWithOption()
+    {
+        $this->expectOutputString("hello foobar!\n");
+        $this->console->addCommand('ConsoleKit\Tests\TestCommand');
+        $this->console->execute('test', array(), array('name' => 'foobar'));
+    }
+
+    public function testExecuteComputedParams()
+    {
+        $this->expectOutputString("\033[31mhello foobar!\033[0m\n");
+        $this->console->addCommand('ConsoleKit\Tests\TestComputedCommand', 'test');
+        list($args, $opts) = $this->console->execute('test', array('foobar', 'arg2'), array('color' => 'red', 'k' => 'v'));
+        $this->assertContains('arg2', $args);
+        $this->assertArrayHasKey('k', $opts);
+    }
+
+    public function testExecuteSubCommand()
+    {
+        $this->console->addCommand('ConsoleKit\Tests\TestSubCommand', 'test');
+        $this->assertEquals('hello foobar!', $this->console->execute('test', array('say-hello', 'foobar')));
+        $this->assertEquals('hi foobar!', $this->console->execute('test', array('say-hi', 'foobar')));
+    }
+
     public function testRun()
     {
-        $this->expectOutputString("foobar\n");
+        $this->expectOutputString("hello unknown!\n");
         $this->console->addCommand('ConsoleKit\Tests\TestCommand');
         $this->console->run(array('test'));
     }
 
     public function testDefaultCommand()
     {
-        $this->expectOutputString("foobar\n");
+        $this->expectOutputString("hello unknown!\n");
         $this->console->addCommand('ConsoleKit\Tests\TestCommand', null, true);
         $this->console->run(array());
     }

@@ -19,7 +19,8 @@
 
 namespace ConsoleKit;
 
-use Closure;
+use Closure,
+    ReflectionMethod;
 
 /**
  * Base class for commands
@@ -87,17 +88,18 @@ abstract class Command
     public function execute(array $args, array $options = array())
     {
         if (!count($args)) {
-            throw new ConsoleException("Not enough arguments");
+            throw new ConsoleException("Missing subcommand name");
         }
         
         $command = ucfirst(Utils::camelize(array_shift($args)));
-        $method = "execute$command";
-        
-        if (!method_exists($this, $method)) {
+        $methodName = "execute$command";
+        if (!method_exists($this, $methodName)) {
             throw new ConsoleException("Command '$command' does not exist");
         }
-        
-        return call_user_func(array($this, $method), $args, $options);
+
+        $method = new ReflectionMethod($this, $methodName);
+        $params = Utils::computeFuncParams($method, $args, $options);
+        return $method->invokeArgs($this, $params);
     }
 
     /**
@@ -109,7 +111,7 @@ abstract class Command
      */
     public function format($text, $formatOptions = array())
     {
-        if (is_int($formatOptions) || is_string($formatOptions)) {
+        if (!is_array($formatOptions)) {
             $formatOptions = array('fgcolor' => $formatOptions);
         }
         $formatOptions = array_merge($this->defaultFormatOptions, $formatOptions);
@@ -142,6 +144,7 @@ abstract class Command
      * @see format()
      * @param string $text
      * @param int|array $formatOptions
+     * @param int $pipe
      * @return Command
      */
     public function write($text, $formatOptions = array(), $pipe = TextWriter::STDOUT)
@@ -164,13 +167,14 @@ abstract class Command
     /**
      * Writes a line of text
      * 
-     * @see write()
      * @param string $text
      * @param int|array $formatOptions
+     * @param int $pipe
      * @return Command
      */
-    public function writeln($text, $formatOptions = array())
+    public function writeln($text, $formatOptions = array(), $pipe = TextWriter::STDOUT)
     {
-        return $this->write("$text\n", $formatOptions);
+        $this->console->writeln($this->format($text, $formatOptions), $pipe);
+        return $this;
     }
 }

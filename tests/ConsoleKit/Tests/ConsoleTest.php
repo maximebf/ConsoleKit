@@ -4,7 +4,8 @@ namespace ConsoleKit\Tests;
 
 use ConsoleKit\Console,
     ConsoleKit\DefaultOptionsParser,
-    ConsoleKit\EchoTextWriter;
+    ConsoleKit\EchoTextWriter,
+    ConsoleKit\Colors;
 
 class ConsoleTest extends ConsoleKitTestCase
 {
@@ -93,6 +94,15 @@ class ConsoleTest extends ConsoleKitTestCase
         $this->console->addCommand('ConsoleKit\Tests\TestSubCommand', 'test');
         $this->assertEquals('hello foobar!', $this->console->execute('test', array('say-hello', 'foobar')));
         $this->assertEquals('hi foobar!', $this->console->execute('test', array('say-hi', 'foobar')));
+    }
+
+    public function testExecuteFunction()
+    {
+        $this->expectOutputString("\033[31mhello foobar!\033[0m\n");
+        $this->console->addCommand(function($args, $opts, $console) {
+            $console->writeln(Colors::colorize(sprintf("hello %s!", $args[0]), $opts['color']));
+        }, 'test');
+        $this->console->execute('test', array('foobar'), array('color' => 'red'));
     }
 
     public function testRun()

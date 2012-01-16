@@ -310,7 +310,7 @@ class Console implements TextWriter
                 $params = Utils::computeFuncParams(new ReflectionFunction($callback), $args, $options);
             }
             $params[] = $this;
-            return call_user_func($callback, $params);
+            return call_user_func_array($callback, $params);
         }
 
         $method = new ReflectionMethod($callback, 'execute');

@@ -1,5 +1,6 @@
 {
     "name": "maximebf/consolekit",
+    "version": "1.0.0",
     "description": "Library to create command line utilities",
     "keywords": ["console", "shell", "cli", "commands"],
     "homepage": "https://github.com/maximebf/ConsoleKit",

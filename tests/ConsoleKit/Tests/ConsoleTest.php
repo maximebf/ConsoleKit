@@ -80,15 +80,6 @@ class ConsoleTest extends ConsoleKitTestCase
         $this->console->execute('test', array(), array('name' => 'foobar'));
     }
 
-    public function testExecuteComputedParams()
-    {
-        $this->expectOutputString("\033[31mhello foobar!\033[0m\n");
-        $this->console->addCommand('ConsoleKit\Tests\TestComputedCommand', 'test');
-        list($args, $opts) = $this->console->execute('test', array('foobar', 'arg2'), array('color' => 'red', 'k' => 'v'));
-        $this->assertContains('arg2', $args);
-        $this->assertArrayHasKey('k', $opts);
-    }
-
     public function testExecuteSubCommand()
     {
         $this->console->addCommand('ConsoleKit\Tests\TestSubCommand', 'test');

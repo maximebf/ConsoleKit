@@ -1,6 +1,8 @@
 # ConsoleKit
 
-PHP 5.3+ library to create command line utilities [![Build Status](https://secure.travis-ci.org/maximebf/ConsoleKit.png)](http://travis-ci.org/maximebf/ConsoleKit)
+PHP 5.3+ library to create command line utilities.
+
+[![Build Status](https://secure.travis-ci.org/maximebf/ConsoleKit.png)](http://travis-ci.org/maximebf/ConsoleKit)
 
 ## Example
 

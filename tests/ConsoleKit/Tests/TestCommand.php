@@ -4,7 +4,7 @@ namespace ConsoleKit\Tests;
 
 class TestCommand extends \ConsoleKit\Command
 {
-    public function execute(array $args, array $opts)
+    public function execute(array $args, array $opts = array())
     {
         $name = 'unknown';
         if (!empty($args)) {

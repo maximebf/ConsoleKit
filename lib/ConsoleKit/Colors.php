@@ -35,27 +35,58 @@ namespace ConsoleKit;
 class Colors
 {
     const RESET = "\033[0m";
-    const BOLD = 10;
 
-    const BLACK = 0;
-    const RED = 1;
-    const GREEN = 2;
-    const YELLOW = 3;
-    const BLUE = 4;
-    const MAGENTA = 5;
-    const CYAN = 6;
-    const WHITE = 7;
+    const BLACK = 1;
+    const RED = 2;
+    const GREEN = 4;
+    const YELLOW = 8;
+    const BLUE = 16;
+    const MAGENTA = 32;
+    const CYAN = 64;
+    const WHITE = 128;
+
+    const BOLD = 256;
+    const UNDERSCORE = 512;
+    const BLINK = 1024;
+    const REVERSE = 2048;
+    const CONCEAL = 4096;
 
     /** @var array */
     private static $colors = array(
-        'black' => 0, 
-        'red' => 1, 
-        'green' => 2, 
-        'yellow' => 3, 
-        'blue' => 4, 
-        'magenta' => 5, 
-        'cyan' => 6, 
-        'white' => 7
+        'black' => self::BLACK, 
+        'red' => self::RED, 
+        'green' => self::GREEN, 
+        'yellow' => self::YELLOW, 
+        'blue' => self::BLUE, 
+        'magenta' => self::MAGENTA, 
+        'cyan' => self::CYAN, 
+        'white' => self::WHITE
+    );
+
+    /** @var array */
+    private static $options = array(
+        'bold' => self::BOLD,
+        'underscore' => self::UNDERSCORE,
+        'blink' => self::BLINK,
+        'reverse' => self::REVERSE,
+        'conceal' => self::CONCEAL
+    );
+
+    /** @var array */
+    private static $codes = array(
+        self::BLACK => 0, 
+        self::RED => 1, 
+        self::GREEN => 2, 
+        self::YELLOW => 3, 
+        self::BLUE => 4, 
+        self::MAGENTA => 5, 
+        self::CYAN => 6, 
+        self::WHITE => 7,
+        self::BOLD => 1,
+        self::UNDERSCORE => 4,
+        self::BLINK => 5,
+        self::REVERSE => 7,
+        self::CONCEAL => 8
     );
 
     /**
@@ -81,31 +112,41 @@ class Colors
         return $text;
     }
 
+    public static function colorizeLines($text, $fgcolor = null, $bgcolor = null)
+    {
+        $lines = explode("\n", $text);
+        foreach ($lines as &$line) {
+            $line = self::colorize($line, $fgcolor, $bgcolor);
+        }
+        return implode("\n", $lines);
+    }
+
     /**
      * Returns a color code
      *
      * $color can be a string with the color name, or one of the color constants.
      *
      * @param int|string $color
-     * @param bool $bold
+     * @param array $options
      * @return int
      */
-    public static function getColorCode($color, $bold = false)
+    public static function getColorCode($color, $options = array())
     {
         $code = (int) $color;
         if (is_string($color)) {
-            $color = strtolower($color);
-            if (strpos($color, '+bold') !== false) {
-                list($color, $_) = explode('+', $color, 2);
-                $bold = true;
-            }
+            $options = array_merge(explode('+', strtolower($color)), $options);
+            $color = array_shift($options);
             if (!isset(self::$colors[$color])) {
-                throw new ConsoleException("Color name '$color' does not exist");
+                throw new ConsoleException("Unknown color '$color'");
             }
             $code = self::$colors[$color];
         }
-        if ($bold) {
-            $code = $code | self::BOLD;
+        foreach ($options as $opt) {
+            $opt = strtolower($opt);
+            if (!isset(self::$options[$opt])) {
+                throw new ConsoleException("Unknown option '$color'");
+            }
+            $code = $code | self::$options[$opt];
         }
         return $code;
     }
@@ -118,12 +159,9 @@ class Colors
      */
     public static function getFgColorString($colorCode)
     {
-        $bold = '';
-        if (($colorCode & self::BOLD) === self::BOLD) {
-            $colorCode = $colorCode & ~self::BOLD;
-            $bold = '1;';
-        }
-        return "\033[{$bold}3{$colorCode}m";
+        list($color, $options) = self::extractColorAndOptions($colorCode);
+        $codes = array_filter(array_merge($options, array("3{$color}")));
+        return sprintf("\033[%sm", implode(';', $codes));
     }
 
     /**
@@ -134,7 +172,30 @@ class Colors
      */
     public static function getBgColorString($colorCode)
     {
-        return "\033[4{$colorCode}m";
+        list($color, $options) = self::extractColorAndOptions($colorCode);
+        $codes = array_filter(array_merge($options, array("4{$color}")));
+        return sprintf("\033[%sm", implode(';', $codes));
+    }
+
+    /**
+     * Extracts the options and the color from a color code
+     * 
+     * @param int $colorCode
+     * @return array
+     */
+    private static function extractColorAndOptions($colorCode)
+    {
+        $options = array();
+        foreach (self::$options as $name => $bit) {
+            if (($colorCode & $bit) === $bit) {
+                $options[] = self::$codes[$bit];
+                $colorCode = $colorCode & ~$bit;
+            }
+        }
+        if (!isset(self::$codes[$colorCode])) {
+            throw new ConsoleException("Cannot parse color code");
+        }
+        return array(self::$codes[$colorCode], $options);
     }
     
     public static function __callStatic($method, $args)

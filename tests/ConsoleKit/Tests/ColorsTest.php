@@ -16,21 +16,21 @@ class ColorsTest extends ConsoleKitTestCase
 
     public function testGetColorCode()
     {
-        $this->assertEquals(1, Colors::getColorCode(Colors::RED));
-        $this->assertEquals(1, Colors::getColorCode('red'));
-        $this->assertEquals(2, Colors::getColorCode('GREEN'));
+        $this->assertEquals(Colors::RED, Colors::getColorCode(Colors::RED));
+        $this->assertEquals(Colors::RED, Colors::getColorCode('red'));
+        $this->assertEquals(Colors::GREEN, Colors::getColorCode('GREEN'));
     }
 
     public function testGetBoldColorCode()
     {
-        $this->assertEquals(11, Colors::getColorCode(Colors::YELLOW | Colors::BOLD));
-        $this->assertEquals(11, Colors::getColorCode('red+bold'));
-        $this->assertEquals(10, Colors::getColorCode('green', true));
+        $this->assertEquals(Colors::YELLOW | Colors::BOLD, Colors::getColorCode(Colors::YELLOW | Colors::BOLD));
+        $this->assertEquals(Colors::RED | Colors::BOLD, Colors::getColorCode('red+bold'));
+        $this->assertEquals(Colors::GREEN | Colors::BOLD, Colors::getColorCode('green', array('bold')));
     }
 
     /**
      * @expectedException        ConsoleKit\ConsoleException
-     * @expectedExceptionMessage Color name 'foobar' does not exist
+     * @expectedExceptionMessage Unknown color 'foobar'
      */
     public function testGetUnknownColorCode()
     {

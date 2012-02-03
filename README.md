@@ -31,12 +31,22 @@ More examples in [example.php](https://github.com/maximebf/ConsoleKit/blob/maste
 
 ## Installation
 
-Download and copy the lib/ConsoleKit folder into php's include path.
-You can also add the folder to your include path using *set\_include\_path()*:
+The easiest way to install ConsoleKit is using [Composer](https://github.com/composer/composer)
+with the following requirement:
+
+    {
+        "require": {
+            "maximebf/consolekit": ">=1.0.0"
+        }
+    }
+
+Alternatively, you can [download the archive](https://github.com/maximebf/ConsoleKit/zipball/master) 
+and add the lib/ folder to PHP's include path:
 
     set_include_path('/path/to/lib' . PATH_SEPARATOR . get_include_path());
 
-You will also need to configure a class autoloader. You can use the following one:
+ConsoleKit does not provided an autoloader but follows the [PSR-0 convention](https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-0.md).  
+You can use the following snipet to autoload ConsoleKit classes:
 
     spl_autoload_register(function($className) {
         if (substr($className, 0, 10) === 'ConsoleKit') {
@@ -94,12 +104,17 @@ Commands need to be registered in the console object using the *addCommand()* me
     $console->addCommand('my_command'); // the my_command function
     $console->addCommand('MyCommand'); // the MyCommand class
     $console->addCommand(function() { echo 'hello!'; }, 'hello'); // using a closure
+    // or:
+    $console->addCommand('hello', function() { echo 'hello!'; }); // alternative when using a closure
 
 Notice that in the last example we have provided a second argument which is an alias for a command.
 As closures have no name, one must be specified.
 
-The command name for functions is the same as the function name with underscores replaced by dashes (ie. my\_command becomes my-command).  
-The command name for command classes is the short class name without the *Command* suffix and "dashized" (ie. HelloWorldCommand becomes hello-world).
+The command name for functions is the same as the function name with underscores replaced 
+by dashes (ie. my\_command becomes my-command).
+
+The command name for command classes is the short class name without the *Command* 
+suffix and "dashized" (ie. HelloWorldCommand becomes hello-world).
 
 ### Running
 
@@ -154,7 +169,7 @@ Options can be defined using *setOptions()* or as the first parameter of the con
 
 Used to interact with the user
 
-    $dialog = new ConsoleKit\Dialog($console);
+    $dialog = new ConsoleKit\Widgets\Dialog($console);
     $name = $dialog->ask('What is your name?');
     if ($dialog->confirm('Are you sure?')) {
         $console->writeln("hello $name");
@@ -164,7 +179,7 @@ Used to interact with the user
 
 Wraps text in a box
 
-    $box = new ConsoleKit\Box($console, 'my text');
+    $box = new ConsoleKit\Widgets\Box($console, 'my text');
     $box->write();
     
 Produces:
@@ -178,7 +193,7 @@ Produces:
 Displays a progress bar
 
     $total = 100;
-    $progress = new ConsoleKit\ProgressBar($console, $total);
+    $progress = new ConsoleKit\Widgets\ProgressBar($console, $total);
     for ($i = 0; $i < $total; $i++) {
         $progress->incr();
         usleep(10000);

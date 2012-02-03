@@ -43,6 +43,19 @@ class TextFormater
     protected $bgColor;
 
     /**
+     * Returns the text formated with the specified options
+     * 
+     * @param string $text
+     * @param array $options
+     * @return string
+     */
+    public static function apply($text, array $options = array())
+    {
+        $formater = new TextFormater($options);
+        return $formater->format($text);
+    }
+
+    /**
      * @param array $options
      */
     public function __construct(array $options = array())

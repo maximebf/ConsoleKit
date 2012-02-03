@@ -112,6 +112,14 @@ class Colors
         return $text;
     }
 
+    /**
+     * Returns a text with each lines colorized independently
+     * 
+     * @param string $text
+     * @param string $fgcolor
+     * @param string $bgcolor
+     * @return string
+     */
     public static function colorizeLines($text, $fgcolor = null, $bgcolor = null)
     {
         $lines = explode("\n", $text);

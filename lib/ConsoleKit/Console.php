@@ -50,6 +50,9 @@ class Console implements TextWriter
     /** @var string */
     protected $defaultCommand;
 
+    /** @var bool */
+    protected $verboseException = false;
+
     /**
      * @param array $commands
      */
@@ -117,6 +120,24 @@ class Console implements TextWriter
     public function exitsOnException()
     {
         return $this->exitOnException;
+    }
+
+    /**
+     * Sets whether a detailed error message is displayed when exception are caught
+     * 
+     * @param boolean $enable
+     */
+    public function setVerboseException($enable = true)
+    {
+        $this->verboseException = $enable;
+    }
+
+    /**
+     * @return bool
+     */
+    public function areExceptionsVerbose()
+    {
+        return $this->verboseException;
     }
 
     /**
@@ -358,16 +379,22 @@ class Console implements TextWriter
      */
     public function writeException(\Exception $e)
     {
-        $text = sprintf("Uncaught exception '%s' with message '%s' in %s:%s\nStack trace:\n%s", 
-            get_class($e),
-            $e->getMessage(),
-            $e->getFile(),
-            $e->getLine(),
-            $e->getTraceAsString()
-        );
+        if ($this->verboseException) {
+            $text = sprintf("[%s]\n%s\nIn %s at line %s\n%s", 
+                get_class($e),
+                $e->getMessage(),
+                $e->getFile(),
+                $e->getLine(),
+                $e->getTraceAsString()
+            );
+        } else {
+            $text = sprintf("\n[%s]\n%s\n", get_class($e), $e->getMessage());
+        }
 
-        $box = new Widgets\Box($this->textWriter, $text);
-        $this->textWriter->writeln(Colors::colorize($box, Colors::RED | Colors::BOLD));
+        $box = new Widgets\Box($this->textWriter, $text, '');
+        $out = Colors::colorizeLines($box, Colors::WHITE, Colors::RED);
+        $out = TextFormater::apply($out, array('indent' => 2));
+        $this->textWriter->writeln($out);
         return $this;
     }
 }

@@ -144,6 +144,10 @@ class Console implements TextWriter
      */
     public function addCommand($callback, $alias = null, $default = false)
     {
+        if ($alias instanceof \Closure && is_string($callback)) {
+            list($alias, $callback) = array($callback, $alias);
+        }
+        
         $name = '';
         if (is_string($callback)) {
             $name = $callback;

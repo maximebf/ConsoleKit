@@ -93,7 +93,11 @@ class ConsoleTest extends ConsoleKitTestCase
         $this->console->addCommand(function($args, $opts, $console) {
             $console->writeln(Colors::colorize(sprintf("hello %s!", $args[0]), $opts['color']));
         }, 'test');
+        $this->console->addCommand('test2', function($args, $opts, $console) {
+            return "success";
+        });
         $this->console->execute('test', array('foobar'), array('color' => 'red'));
+        $this->assertEquals("success", $this->console->execute('test2'));
     }
 
     public function testRun()

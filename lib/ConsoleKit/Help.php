@@ -88,7 +88,7 @@ class Help
         $class = new ReflectionClass($name);
 
         if ($subCommand) {
-            $method = $prefix . ucfirst($subCommand);
+            $method = $prefix . ucfirst(Utils::camelize($subCommand));
             if (!$class->hasMethod($method)) {
                 throw new ConsoleException("Sub command '$subCommand' of '$name' does not exist");
             }
@@ -128,7 +128,7 @@ class Help
         foreach ($lines as $line) {
             if (preg_match('/@usage (.+)$/', $line, $matches)) {
                 $this->usage = $matches[1];
-            } else if (preg_match('/@arg ([a-zA-Z\-_0-9]+)( (.*)|)$/', $line, $matches)) {
+            } else if (preg_match('/@arg ([^\s]+)( (.*)|)$/', $line, $matches)) {
                 $this->args[$matches[1]] = isset($matches[3]) ? $matches[3] : '';
             } else if (preg_match('/@opt ([a-zA-Z\-_0-9=]+)( (.*)|)$/', $line, $matches)) {
                 $this->options[$matches[1]] = isset($matches[3]) ? $matches[3] : '';

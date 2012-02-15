@@ -19,7 +19,7 @@
 
     <filter>
         <whitelist>
-            <directory>./src/ConsoleKit/</directory>
+            <directory>./lib/ConsoleKit/</directory>
         </whitelist>
     </filter>
 </phpunit>

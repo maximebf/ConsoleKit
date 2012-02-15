@@ -45,8 +45,8 @@ and add the lib/ folder to PHP's include path:
 
     set_include_path('/path/to/lib' . PATH_SEPARATOR . get_include_path());
 
-ConsoleKit does not provided an autoloader but follows the [PSR-0 convention](https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-0.md).  
-You can use the following snipet to autoload ConsoleKit classes:
+ConsoleKit does not provide an autoloader but follows the [PSR-0 convention](https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-0.md).  
+You can use the following snippet to autoload ConsoleKit classes:
 
     spl_autoload_register(function($className) {
         if (substr($className, 0, 10) === 'ConsoleKit') {
@@ -85,8 +85,8 @@ arguments array, the options array and the console object.
         $console->writeln("hello world!");
     }
 
-Commands can also be defined as classes. In this case, they must inherit from *ConsoleKit\Command*
-and override the *execute()* method.
+Commands can also be defined as classes. In this case, they must inherit from `ConsoleKit\Command`
+and override the `execute()` method.
 
     class MyCommand extends ConsoleKit\Command {
         public function execute(array $args, array $opts) {
@@ -94,11 +94,11 @@ and override the *execute()* method.
         }
     }
 
-The *ConsoleKit\Command* class offers helper methods, check it out for more info.
+The `ConsoleKit\Command` class offers helper methods, check it out for more info.
 
 ### Registering commands
 
-Commands need to be registered in the console object using the *addCommand()* method (or *addCommands()*).
+Commands need to be registered in the console object using the `addCommand()` method (or `addCommands()`).
 
     $console = new ConsoleKit\Console();
     $console->addCommand('my_command'); // the my_command function
@@ -113,12 +113,12 @@ As closures have no name, one must be specified.
 The command name for functions is the same as the function name with underscores replaced 
 by dashes (ie. my\_command becomes my-command).
 
-The command name for command classes is the short class name without the *Command* 
+The command name for command classes is the short class name without the `Command` 
 suffix and "dashized" (ie. HelloWorldCommand becomes hello-world).
 
 ### Running
 
-Simply call the *run()* method of the console object
+Simply call the `run()` method of the console object
 
     $console->run();
     $console->run(array('custom arg1', 'custom arg2')); // overrides $_SERVER['argv']
@@ -134,8 +134,8 @@ Check out [example.php](https://github.com/maximebf/ConsoleKit/blob/master/examp
 
 ### Colors
 
-The *ConsoleKit\Colors::colorize()* method provides an easy way to colorize a text. 
-Colors are defined as either a string or an integer (through constants of the *Colors* class).  
+The `ConsoleKit\Colors::colorize()` method provides an easy way to colorize a text. 
+Colors are defined as either a string or an integer (through constants of the `Colors` class).  
 Available colors: black, red, green, yellow, blue, magenta, cyan, white.
 
 Foreground colors are also available in a "bold" variant. Suffix the color name with "+bold" or use the OR bit operator with constants.
@@ -150,14 +150,14 @@ Foreground colors are also available in a "bold" variant. Suffix the color name 
    
 ### TextFormater
 
-The *ConsoleKit\TextFormater* class allows you to format text using the following options:
+The `ConsoleKit\TextFormater` class allows you to format text using the following options:
 
- -  indentation using *setIndent()* or the *indent* option
- -  quoting using *setQuote()* or the *quote* option
- -  foreground color using *setFgColor()* or the *fgcolor* option
- -  background color using *setBgColor()* or the *bgcolor* option
+ -  indentation using `setIndent()` or the *indent* option
+ -  quoting using `setQuote()` or the *quote* option
+ -  foreground color using `setFgColor()` or the *fgcolor* option
+ -  background color using `setBgColor()` or the *bgcolor* option
 
-Options can be defined using *setOptions()* or as the first parameter of the constructor.
+Options can be defined using `setOptions()` or as the first parameter of the constructor.
 
     $formater = new ConsoleKit\TextFormater(array('quote' => ' > '));
     echo $formater->format("hello!");

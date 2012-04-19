@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8' />
+    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+    <meta name="description" content="Consolekit : PHP 5.3 library to create command line utilities" />
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>Consolekit</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/maximebf/ConsoleKit">Fork Me on GitHub</a>
+
+          <h1 id="project_title">Consolekit</h1>
+          <h2 id="project_tagline">PHP 5.3 library to create command line utilities</h2>
+
+          <section id="downloads">
+            <a class="zip_download_link" href="https://github.com/maximebf/ConsoleKit/zipball/master">Download this project as a .zip file</a>
+            <a class="tar_download_link" href="https://github.com/maximebf/ConsoleKit/tarball/master">Download this project as a tar.gz file</a>
+          </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <p>In <em>cli.php</em>:</p>
+
+<pre><code>&lt;?php
+
+class HelloCommand extends ConsoleKit\Command
+{
+    public function execute(array $args, array $options = array())
+    {
+        $this-&gt;writeln('hello world!', ConsoleKit\Colors::GREEN);
+    }
+}
+
+$console = new ConsoleKit\Console();
+$console-&gt;addCommand('HelloCommand');
+$console-&gt;run();
+</code></pre>
+
+<p>In the shell:</p>
+
+<pre><code>$ php cli.php hello
+hello world!
+</code></pre>
+
+<p>More examples in <a href="https://github.com/maximebf/ConsoleKit/blob/master/example.php">example.php</a></p>
+
+<h1>Installation</h1>
+
+<p>The easiest way to install ConsoleKit is using <a href="https://github.com/composer/composer">Composer</a>
+with the following requirement:</p>
+
+<pre><code>{
+    "require": {
+        "maximebf/consolekit": "&gt;=1.0.0"
+    }
+}
+</code></pre>
+
+<p>Alternatively, you can <a href="https://github.com/maximebf/ConsoleKit/zipball/master">download the archive</a> 
+and add the lib/ folder to PHP's include path:</p>
+
+<pre><code>set_include_path('/path/to/lib' . PATH_SEPARATOR . get_include_path());
+</code></pre>
+
+<p>ConsoleKit does not provide an autoloader but follows the <a href="https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-0.md">PSR-0 convention</a>.<br>
+You can use the following snippet to autoload ConsoleKit classes:</p>
+
+<pre><code>spl_autoload_register(function($className) {
+    if (substr($className, 0, 10) === 'ConsoleKit') {
+        $filename = str_replace('\\', DIRECTORY_SEPARATOR, trim($className, '\\')) . '.php';
+        require_once $filename;
+    }
+});
+</code></pre>
+
+<h1>Usage</h1>
+
+<h2>Options parser</h2>
+
+<p>The default options parser parses an argv-like array.
+Items can be of the form:</p>
+
+<ul>
+<li> --key=value</li>
+<li> --key</li>
+<li> -a</li>
+<li> -ab (equivalent of -a -b)</li>
+</ul><p>When an option has no value, true will be used. If multiple key/value pairs
+with the same key are specified, the "key" value will be an array containing all the values.<br>
+If "--" is detected, all folowing values will be treated as a single argument</p>
+
+<p>Example: the string "-a -bc --longopt --key=value arg1 arg2 -- --any text" will produce the following two arrays:</p>
+
+<pre><code>$args = array('arg1', 'arg2', '--any text');
+$options = array('a' =&gt; true, 'b' =&gt; true, 'c' =&gt; true, 'longopt' =&gt; true, 'key' =&gt; 'value');
+</code></pre>
+
+<h2>Creating commands</h2>
+
+<p>Any callbacks can be a command. It will receive three parameters: the 
+arguments array, the options array and the console object.</p>
+
+<pre><code>function my_command($args, $opts, $console) {
+    $console-&gt;writeln("hello world!");
+}
+</code></pre>
+
+<p>Commands can also be defined as classes. In this case, they must inherit from <code>ConsoleKit\Command</code>
+and override the <code>execute()</code> method.</p>
+
+<pre><code>class MyCommand extends ConsoleKit\Command {
+    public function execute(array $args, array $opts) {
+        $this-&gt;writeln("hello world!");
+    }
+}
+</code></pre>
+
+<p>The <code>ConsoleKit\Command</code> class offers helper methods, check it out for more info.</p>
+
+<h2>Registering commands</h2>
+
+<p>Commands need to be registered in the console object using the <code>addCommand()</code> method (or <code>addCommands()</code>).</p>
+
+<pre><code>$console = new ConsoleKit\Console();
+$console-&gt;addCommand('my_command'); // the my_command function
+$console-&gt;addCommand('MyCommand'); // the MyCommand class
+$console-&gt;addCommand(function() { echo 'hello!'; }, 'hello'); // using a closure
+// or:
+$console-&gt;addCommand('hello', function() { echo 'hello!'; }); // alternative when using a closure
+</code></pre>
+
+<p>Notice that in the last example we have provided a second argument which is an alias for a command.
+As closures have no name, one must be specified.</p>
+
+<p>The command name for functions is the same as the function name with underscores replaced 
+by dashes (ie. my_command becomes my-command).</p>
+
+<p>The command name for command classes is the short class name without the <code>Command</code> 
+suffix and "dashized" (ie. HelloWorldCommand becomes hello-world).</p>
+
+<h2>Running</h2>
+
+<p>Simply call the <code>run()</code> method of the console object</p>
+
+<pre><code>$console-&gt;run();
+$console-&gt;run(array('custom arg1', 'custom arg2')); // overrides $_SERVER['argv']
+</code></pre>
+
+<h2>Automatic help generation</h2>
+
+<p>The <em>help</em> command is automatically registered and provides help about available methods based on doc comments.<br>
+Check out <a href="https://github.com/maximebf/ConsoleKit/blob/master/example.php">example.php</a> for example of available tags</p>
+
+<pre><code>$ php myscript.php help
+</code></pre>
+
+<h1>Formating text</h1>
+
+<h2>Colors</h2>
+
+<p>The <code>ConsoleKit\Colors::colorize()</code> method provides an easy way to colorize a text. 
+Colors are defined as either a string or an integer (through constants of the <code>Colors</code> class).<br>
+Available colors: black, red, green, yellow, blue, magenta, cyan, white.</p>
+
+<p>Foreground colors are also available in a "bold" variant. Suffix the color name with "+bold" or use the OR bit operator with constants.</p>
+
+<pre><code>echo Colors::colorize('my red text', Colors::RED);
+echo Colors::colorize('my red text', 'red');
+
+echo Colors::colorize('my red bold text', Colors::RED | Colors::BOLD);
+echo Colors::colorize('my red bold text', 'red+bold');
+
+echo Colors::colorize('my red text over yellow background', Colors::RED, Colors::YELLOW);
+</code></pre>
+
+<h2>TextFormater</h2>
+
+<p>The <code>ConsoleKit\TextFormater</code> class allows you to format text using the following options:</p>
+
+<ul>
+<li> indentation using <code>setIndent()</code> or the <em>indent</em> option</li>
+<li> quoting using <code>setQuote()</code> or the <em>quote</em> option</li>
+<li> foreground color using <code>setFgColor()</code> or the <em>fgcolor</em> option</li>
+<li> background color using <code>setBgColor()</code> or the <em>bgcolor</em> option</li>
+</ul><p>Options can be defined using <code>setOptions()</code> or as the first parameter of the constructor.</p>
+
+<pre><code>$formater = new ConsoleKit\TextFormater(array('quote' =&gt; ' &gt; '));
+echo $formater-&gt;format("hello!");
+// produces: " &gt; hello"
+</code></pre>
+
+<h1>Widgets</h1>
+
+<h2>Dialog</h2>
+
+<p>Used to interact with the user</p>
+
+<pre><code>$dialog = new ConsoleKit\Widgets\Dialog($console);
+$name = $dialog-&gt;ask('What is your name?');
+if ($dialog-&gt;confirm('Are you sure?')) {
+    $console-&gt;writeln("hello $name");
+}
+</code></pre>
+
+<h2>Box</h2>
+
+<p>Wraps text in a box</p>
+
+<pre><code>$box = new ConsoleKit\Widgets\Box($console, 'my text');
+$box-&gt;write();
+</code></pre>
+
+<p>Produces:</p>
+
+<pre><code>********************************************
+*                 my text                  *
+********************************************
+</code></pre>
+
+<h2>Progress bar</h2>
+
+<p>Displays a progress bar</p>
+
+<pre><code>$total = 100;
+$progress = new ConsoleKit\Widgets\ProgressBar($console, $total);
+for ($i = 0; $i &lt; $total; $i++) {
+    $progress-&gt;incr();
+    usleep(10000);
+}
+$progress-&gt;stop();
+</code></pre>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">Consolekit maintained by <a href="https://github.com/maximebf">maximebf</a></p>
+        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+    
+
+  </body>
+</html>

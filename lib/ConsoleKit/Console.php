@@ -53,6 +53,9 @@ class Console implements TextWriter
     /** @var bool */
     protected $verboseException = false;
 
+    /** @var bool */
+    protected $singleCommand = false;
+
     /**
      * @param array $commands
      */
@@ -279,6 +282,17 @@ class Console implements TextWriter
     {
         return $this->defaultCommand;
     }
+
+    /**
+     * Turn off command parsing
+     *
+     * @param type $singleCommand
+     * @return Console
+     */
+    public function setSingleCommand($singleCommand) {
+        $this->singleCommand = $singleCommand;
+        return $this;
+    }
     
     /**
      * @param array $args
@@ -292,6 +306,10 @@ class Console implements TextWriter
             }
 
             list($args, $options) = $this->getOptionsParser()->parse($argv);
+            if($this->defaultCommand && $this->singleCommand) {
+                return $this->execute($this->defaultCommand, $args, $options);
+            }
+            
             if (!count($args)) {
                 if ($this->defaultCommand) {
                     $args[] = $this->defaultCommand;

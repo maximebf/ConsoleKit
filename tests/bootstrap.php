@@ -2,7 +2,7 @@
 
 set_include_path(implode(PATH_SEPARATOR, array(
     __DIR__,
-    __DIR__ . '/../lib',
+    __DIR__ . '/../src',
     get_include_path()
 )));
 

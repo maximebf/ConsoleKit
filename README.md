@@ -41,9 +41,9 @@ with the following requirement:
     }
 
 Alternatively, you can [download the archive](https://github.com/maximebf/ConsoleKit/zipball/master) 
-and add the lib/ folder to PHP's include path:
+and add the src/ folder to PHP's include path:
 
-    set_include_path('/path/to/lib' . PATH_SEPARATOR . get_include_path());
+    set_include_path('/path/to/src' . PATH_SEPARATOR . get_include_path());
 
 ConsoleKit does not provide an autoloader but follows the [PSR-0 convention](https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-0.md).  
 You can use the following snippet to autoload ConsoleKit classes:

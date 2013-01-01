@@ -2,7 +2,7 @@
 
 PHP 5.3+ library to create command line utilities.
 
-[![Build Status](https://secure.travis-ci.org/maximebf/ConsoleKit.png)](http://travis-ci.org/maximebf/ConsoleKit)
+[![Build Status](https://travis-ci.org/maximebf/ConsoleKit.png?branch=master)](http://travis-ci.org/maximebf/ConsoleKit)
 
 ## Example
 

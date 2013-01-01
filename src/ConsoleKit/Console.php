@@ -176,16 +176,11 @@ class Console implements TextWriter
                 } else {
                     $name = strtolower(trim(str_replace('_', '-', $name), '-'));
                 }
-            } else if (class_exists($callback)) {
-                if (!is_subclass_of($callback, 'ConsoleKit\Command')) {
-                    throw new ConsoleException("'$callback' must be a subclass of 'ConsoleKit\Command'");
-                }
+            } else {
                 if (substr($name, -7) === 'Command') {
                     $name = substr($name, 0, -7);
                 }
                 $name = Utils::dashized(basename(str_replace('\\', '/', $name)));
-            } else {
-                throw new ConsoleException("'$callback' must reference a class or a function");
             }
         } else if (is_object($callback) && !($callback instanceof Closure)) {
             $classname = get_class($callback);
@@ -349,7 +344,13 @@ class Console implements TextWriter
         if (is_callable($callback)) {
             $params = array($args, $options);
             if (is_string($callback)) {
-                $params = Utils::computeFuncParams(new ReflectionFunction($callback), $args, $options);
+                if (strpos($callback, '::') !== false) {
+                    list($classname, $methodname) = explode('::', $callback);
+                    $reflection = new ReflectionMethod($classname, $methodname);
+                } else {
+                    $reflection = new ReflectionFunction($callback);
+                }
+                $params = Utils::computeFuncParams($reflection, $args, $options);
             }
             $params[] = $this;
             return call_user_func_array($callback, $params);

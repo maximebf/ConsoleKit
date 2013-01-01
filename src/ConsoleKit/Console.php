@@ -183,7 +183,7 @@ class Console implements TextWriter
                 if (substr($name, -7) === 'Command') {
                     $name = substr($name, 0, -7);
                 }
-                $name = Utils::dashized(array_pop(explode('\\', $name)));
+                $name = Utils::dashized(basename(str_replace('\\', '/', $name)));
             } else {
                 throw new ConsoleException("'$callback' must reference a class or a function");
             }

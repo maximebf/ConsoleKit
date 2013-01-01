@@ -162,12 +162,20 @@ class Console implements TextWriter
         if ($alias instanceof \Closure && is_string($callback)) {
             list($alias, $callback) = array($callback, $alias);
         }
+        if (is_array($callback) && is_string($callback[0])) {
+            $callback = implode('::', $callback);
+        }
         
         $name = '';
         if (is_string($callback)) {
             $name = $callback;
-            if (function_exists($callback)) {
-                $name = strtolower(trim(str_replace('_', '-', $name), '-'));
+            if (is_callable($callback)) {
+                if (strpos($callback, '::') !== false) {
+                    list($classname, $methodname) = explode('::', $callback);
+                    $name = Utils::dashized($methodname);
+                } else {
+                    $name = strtolower(trim(str_replace('_', '-', $name), '-'));
+                }
             } else if (class_exists($callback)) {
                 if (!is_subclass_of($callback, 'ConsoleKit\Command')) {
                     throw new ConsoleException("'$callback' must be a subclass of 'ConsoleKit\Command'");
@@ -175,7 +183,7 @@ class Console implements TextWriter
                 if (substr($name, -7) === 'Command') {
                     $name = substr($name, 0, -7);
                 }
-                $name = Utils::dashized(basename(str_replace('\\', '/', $name)));
+                $name = Utils::dashized(array_pop(explode('\\', $name)));
             } else {
                 throw new ConsoleException("'$callback' must reference a class or a function");
             }

@@ -26,6 +26,10 @@ class ConsoleTest extends ConsoleKitTestCase
         $this->assertArrayHasKey('test-alias', $this->console->getCommands());
         $this->assertEquals('ConsoleKit\Tests\TestCommand', $this->console->getCommand('test-alias'));
 
+        $this->console->addCommand('ConsoleKit\Tests\TestStatic::sayHello');
+        $this->assertArrayHasKey('say-hello', $this->console->getCommands());
+        $this->assertEquals('ConsoleKit\Tests\TestStatic::sayHello', $this->console->getCommand('say-hello'));
+
         $this->console->addCommand('var_dump');
         $this->assertArrayHasKey('var-dump', $this->console->getCommands());
         $this->assertEquals('var_dump', $this->console->getCommand('var-dump'));

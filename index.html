@@ -1,36 +1,43 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
-
   <head>
-    <meta charset='utf-8' />
-    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
-    <meta name="description" content="Consolekit : PHP 5.3 library to create command line utilities" />
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Consolekit by maximebf</title>
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script src="javascripts/respond.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <!--[if lt IE 8]>
+    <link rel="stylesheet" href="stylesheets/ie.css">
+    <![endif]-->
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
 
-    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
-
-    <title>Consolekit</title>
   </head>
-
   <body>
+      <div id="header">
+        <nav>
+          <li class="fork"><a href="https://github.com/maximebf/ConsoleKit">View On GitHub</a></li>
+          <li class="downloads"><a href="https://github.com/maximebf/ConsoleKit/zipball/master">ZIP</a></li>
+          <li class="downloads"><a href="https://github.com/maximebf/ConsoleKit/tarball/master">TAR</a></li>
+          <li class="title">DOWNLOADS</li>
+        </nav>
+      </div><!-- end header -->
 
-    <!-- HEADER -->
-    <div id="header_wrap" class="outer">
-        <header class="inner">
-          <a id="forkme_banner" href="https://github.com/maximebf/ConsoleKit">Fork Me on GitHub</a>
+    <div class="wrapper">
 
-          <h1 id="project_title">Consolekit</h1>
-          <h2 id="project_tagline">PHP 5.3 library to create command line utilities</h2>
+      <section>
+        <div id="title">
+          <h1>Consolekit</h1>
+          <p>PHP 5.3 library to create command line utilities</p>
+          <hr>
+          <span class="credits left">Project maintained by <a href="https://github.com/maximebf">maximebf</a></span>
+          <span class="credits right">Hosted on GitHub Pages &mdash; Theme by <a href="https://twitter.com/michigangraham">mattgraham</a></span>
+        </div>
 
-          <section id="downloads">
-            <a class="zip_download_link" href="https://github.com/maximebf/ConsoleKit/zipball/master">Download this project as a .zip file</a>
-            <a class="tar_download_link" href="https://github.com/maximebf/ConsoleKit/tarball/master">Download this project as a tar.gz file</a>
-          </section>
-        </header>
-    </div>
-
-    <!-- MAIN CONTENT -->
-    <div id="main_content_wrap" class="outer">
-      <section id="main_content" class="inner">
         <p>In <em>cli.php</em>:</p>
 
 <pre><code>&lt;?php
@@ -56,7 +63,8 @@ hello world!
 
 <p>More examples in <a href="https://github.com/maximebf/ConsoleKit/blob/master/example.php">example.php</a></p>
 
-<h1>Installation</h1>
+<h1>
+<a name="installation" class="anchor" href="#installation"><span class="octicon octicon-link"></span></a>Installation</h1>
 
 <p>The easiest way to install ConsoleKit is using <a href="https://github.com/composer/composer">Composer</a>
 with the following requirement:</p>
@@ -85,9 +93,11 @@ You can use the following snippet to autoload ConsoleKit classes:</p>
 });
 </code></pre>
 
-<h1>Usage</h1>
+<h1>
+<a name="usage" class="anchor" href="#usage"><span class="octicon octicon-link"></span></a>Usage</h1>
 
-<h2>Options parser</h2>
+<h2>
+<a name="options-parser" class="anchor" href="#options-parser"><span class="octicon octicon-link"></span></a>Options parser</h2>
 
 <p>The default options parser parses an argv-like array.
 Items can be of the form:</p>
@@ -107,7 +117,8 @@ If "--" is detected, all folowing values will be treated as a single argument</p
 $options = array('a' =&gt; true, 'b' =&gt; true, 'c' =&gt; true, 'longopt' =&gt; true, 'key' =&gt; 'value');
 </code></pre>
 
-<h2>Creating commands</h2>
+<h2>
+<a name="creating-commands" class="anchor" href="#creating-commands"><span class="octicon octicon-link"></span></a>Creating commands</h2>
 
 <p>Any callbacks can be a command. It will receive three parameters: the 
 arguments array, the options array and the console object.</p>
@@ -129,7 +140,8 @@ and override the <code>execute()</code> method.</p>
 
 <p>The <code>ConsoleKit\Command</code> class offers helper methods, check it out for more info.</p>
 
-<h2>Registering commands</h2>
+<h2>
+<a name="registering-commands" class="anchor" href="#registering-commands"><span class="octicon octicon-link"></span></a>Registering commands</h2>
 
 <p>Commands need to be registered in the console object using the <code>addCommand()</code> method (or <code>addCommands()</code>).</p>
 
@@ -150,7 +162,8 @@ by dashes (ie. my_command becomes my-command).</p>
 <p>The command name for command classes is the short class name without the <code>Command</code> 
 suffix and "dashized" (ie. HelloWorldCommand becomes hello-world).</p>
 
-<h2>Running</h2>
+<h2>
+<a name="running" class="anchor" href="#running"><span class="octicon octicon-link"></span></a>Running</h2>
 
 <p>Simply call the <code>run()</code> method of the console object</p>
 
@@ -158,7 +171,8 @@ suffix and "dashized" (ie. HelloWorldCommand becomes hello-world).</p>
 $console-&gt;run(array('custom arg1', 'custom arg2')); // overrides $_SERVER['argv']
 </code></pre>
 
-<h2>Automatic help generation</h2>
+<h2>
+<a name="automatic-help-generation" class="anchor" href="#automatic-help-generation"><span class="octicon octicon-link"></span></a>Automatic help generation</h2>
 
 <p>The <em>help</em> command is automatically registered and provides help about available methods based on doc comments.<br>
 Check out <a href="https://github.com/maximebf/ConsoleKit/blob/master/example.php">example.php</a> for example of available tags</p>
@@ -166,9 +180,11 @@ Check out <a href="https://github.com/maximebf/ConsoleKit/blob/master/example.ph
 <pre><code>$ php myscript.php help
 </code></pre>
 
-<h1>Formating text</h1>
+<h1>
+<a name="formating-text" class="anchor" href="#formating-text"><span class="octicon octicon-link"></span></a>Formating text</h1>
 
-<h2>Colors</h2>
+<h2>
+<a name="colors" class="anchor" href="#colors"><span class="octicon octicon-link"></span></a>Colors</h2>
 
 <p>The <code>ConsoleKit\Colors::colorize()</code> method provides an easy way to colorize a text. 
 Colors are defined as either a string or an integer (through constants of the <code>Colors</code> class).<br>
@@ -185,7 +201,8 @@ echo Colors::colorize('my red bold text', 'red+bold');
 echo Colors::colorize('my red text over yellow background', Colors::RED, Colors::YELLOW);
 </code></pre>
 
-<h2>TextFormater</h2>
+<h2>
+<a name="textformater" class="anchor" href="#textformater"><span class="octicon octicon-link"></span></a>TextFormater</h2>
 
 <p>The <code>ConsoleKit\TextFormater</code> class allows you to format text using the following options:</p>
 
@@ -201,9 +218,11 @@ echo $formater-&gt;format("hello!");
 // produces: " &gt; hello"
 </code></pre>
 
-<h1>Widgets</h1>
+<h1>
+<a name="widgets" class="anchor" href="#widgets"><span class="octicon octicon-link"></span></a>Widgets</h1>
 
-<h2>Dialog</h2>
+<h2>
+<a name="dialog" class="anchor" href="#dialog"><span class="octicon octicon-link"></span></a>Dialog</h2>
 
 <p>Used to interact with the user</p>
 
@@ -214,7 +233,8 @@ if ($dialog-&gt;confirm('Are you sure?')) {
 }
 </code></pre>
 
-<h2>Box</h2>
+<h2>
+<a name="box" class="anchor" href="#box"><span class="octicon octicon-link"></span></a>Box</h2>
 
 <p>Wraps text in a box</p>
 
@@ -229,7 +249,8 @@ $box-&gt;write();
 ********************************************
 </code></pre>
 
-<h2>Progress bar</h2>
+<h2>
+<a name="progress-bar" class="anchor" href="#progress-bar"><span class="octicon octicon-link"></span></a>Progress bar</h2>
 
 <p>Displays a progress bar</p>
 
@@ -242,17 +263,9 @@ for ($i = 0; $i &lt; $total; $i++) {
 $progress-&gt;stop();
 </code></pre>
       </section>
-    </div>
 
-    <!-- FOOTER  -->
-    <div id="footer_wrap" class="outer">
-      <footer class="inner">
-        <p class="copyright">Consolekit maintained by <a href="https://github.com/maximebf">maximebf</a></p>
-        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
-      </footer>
     </div>
-
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
     
-
   </body>
 </html>

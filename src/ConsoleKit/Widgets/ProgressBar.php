@@ -163,7 +163,7 @@ class ProgressBar extends AbstractWidget
         if ($this->showRemainingTime) {
             $speed = (time() - $this->startTime) / $this->value;
             $remaining = number_format(round($speed * ($this->total - $this->value), 2), 2);
-            $output .= "$remaining sec remaining";
+            $output .= " - $remaining sec remaining";
         }
 
         return $output;

@@ -23,8 +23,8 @@
     }
   ],
   "autoload": {
-    "psr-0": {
-      "ConsoleKit": "src/"
+    "psr-4": {
+      "ConsoleKit\\": "src/ConsoleKit"
     }
   },
   "require-dev": {

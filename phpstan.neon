@@ -6,6 +6,8 @@ parameters:
   phpVersion: 70100
   paths:
     - src
+    - example.php
   excludePaths:
     - vendor
     - tests
+    - README.md

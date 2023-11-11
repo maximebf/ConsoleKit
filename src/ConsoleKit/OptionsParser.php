@@ -10,13 +10,12 @@
 
 namespace ConsoleKit;
 
-interface OptionsParser
-{
-    /**
-     * Parses the array and returns a tuple containing the arguments and the options
-     *
-     * @param array $argv
-     * @return array
-     */
-    function parse(array $argv);
+interface OptionsParser {
+  /**
+   * Parses the array and returns a tuple containing the arguments and the options
+   *
+   * @param array $argv
+   * @return array
+   */
+  function parse(array $argv);
 }

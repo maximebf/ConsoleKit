@@ -15,15 +15,12 @@ namespace ConsoleKit;
  *
  * Note: Pipes are ignored
  */
-class EchoTextWriter implements TextWriter
-{
-    public function write($text, $pipe = TextWriter::STDOUT)
-    {
-        echo $text;
-    }
+class EchoTextWriter implements TextWriter {
+  function write($text, $pipe = TextWriter::STDOUT) {
+    echo $text;
+  }
 
-    public function writeln($text = '', $pipe = TextWriter::STDOUT)
-    {
-        $this->write("$text\n", $pipe);
-    }
+  function writeln($text = '', $pipe = TextWriter::STDOUT) {
+    $this->write("$text\n", $pipe);
+  }
 }

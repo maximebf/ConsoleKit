@@ -10,7 +10,5 @@
 
 namespace ConsoleKit;
 
-class ConsoleException extends \Exception
-{
-    
+class ConsoleException extends \Exception {
 }

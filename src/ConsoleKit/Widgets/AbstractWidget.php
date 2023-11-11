@@ -12,34 +12,30 @@ namespace ConsoleKit\Widgets;
 
 use ConsoleKit\TextWriter;
 
-abstract class AbstractWidget
-{
-    /** @var TextWriter */
-    protected $textWriter;
+abstract class AbstractWidget {
+  /** @var TextWriter */
+  protected $textWriter;
 
-    /**
-     * @param TextWriter $writer
-     */
-    public function __construct(TextWriter $writer)
-    {
-        $this->textWriter = $writer;
-    }
+  /**
+   * @param TextWriter $writer
+   */
+  function __construct(TextWriter $writer) {
+    $this->textWriter = $writer;
+  }
 
-    /**
-     * @param TextWriter $writer
-     * @return Dialog
-     */
-    public function setTextWriter(TextWriter $writer)
-    {
-        $this->textWriter = $writer;
-        return $this;
-    }
+  /**
+   * @param TextWriter $writer
+   * @return Dialog
+   */
+  function setTextWriter(TextWriter $writer) {
+    $this->textWriter = $writer;
+    return $this;
+  }
 
-    /**
-     * @return TextWriter
-     */
-    public function getTextWriter()
-    {
-        return $this->textWriter;
-    }
+  /**
+   * @return TextWriter
+   */
+  function getTextWriter() {
+    return $this->textWriter;
+  }
 }

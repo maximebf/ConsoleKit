@@ -13,17 +13,14 @@ namespace ConsoleKit;
 /**
  * Text writer that writes to stdout or stderr
  */
-class StdTextWriter implements TextWriter
-{
-    public function write($text, $pipe = TextWriter::STDOUT)
-    {
-        $f = fopen('php://' . $pipe, 'w');
-        fwrite($f, $text);
-        fclose($f);
-    }
+class StdTextWriter implements TextWriter {
+  function write($text, $pipe = TextWriter::STDOUT) {
+    $f = fopen('php://' . $pipe, 'w');
+    fwrite($f, $text);
+    fclose($f);
+  }
 
-    public function writeln($text = '', $pipe = TextWriter::STDOUT)
-    {
-        $this->write("$text\n", $pipe);
-    }
+  function writeln($text = '', $pipe = TextWriter::STDOUT) {
+    $this->write("$text\n", $pipe);
+  }
 }

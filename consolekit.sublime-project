@@ -1,0 +1,20 @@
+{
+  "folders": [
+    {
+      "path": ".",
+    }
+  ],
+  "settings": {
+    "LSP": {
+      "LSP-intelephense": {
+        "settings": {
+          // "intelephense.environment.phpVersion": "5.3.0",
+        },
+      },
+      "formatters":
+      {
+				"embedding.php": "LSP-intelephense"
+			},
+    },
+  },
+}

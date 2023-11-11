@@ -13,182 +13,167 @@ namespace ConsoleKit;
 /**
  * Utility functions to format text
  */
-class TextFormater
-{
-    /** @var int */
-    public static $defaultIndentWidth = 1;
+class TextFormater {
+  /** @var int */
+  public static $defaultIndentWidth = 1;
 
-    /** @var int */
-    protected $indentWidth = 1;
+  /** @var int */
+  protected $indentWidth = 1;
 
-    /** @var int */
-    protected $indent = 0;
+  /** @var int */
+  protected $indent = 0;
 
-    /** @var string */
-    protected $quote = '';
+  /** @var string */
+  protected $quote = '';
 
-    /** @var string */
-    protected $fgColor;
+  /** @var string */
+  protected $fgColor;
 
-    /** @var string */
-    protected $bgColor;
+  /** @var string */
+  protected $bgColor;
 
-    /**
-     * Returns the text formated with the specified options
-     * 
-     * @param string $text
-     * @param array $options
-     * @return string
-     */
-    public static function apply($text, array $options = array())
-    {
-        $formater = new TextFormater($options);
-        return $formater->format($text);
+  /**
+   * Returns the text formated with the specified options
+   *
+   * @param string $text
+   * @param array $options
+   * @return string
+   */
+  static function apply($text, array $options = array()) {
+    $formater = new TextFormater($options);
+    return $formater->format($text);
+  }
+
+  /**
+   * @param array $options
+   */
+  function __construct(array $options = array()) {
+    $this->indentWidth = self::$defaultIndentWidth;
+    $this->setOptions($options);
+  }
+
+  /**
+   * Available options:
+   *  - indentWidth
+   *  - indent
+   *  - quote
+   *  - fgcolor
+   *  - bgcolor
+   *
+   * @param array $options
+   * @return TextFormater
+   */
+  function setOptions(array $options) {
+    if (isset($options['indentWidth'])) {
+      $this->setIndentWidth($options['indentWidth']);
     }
-
-    /**
-     * @param array $options
-     */
-    public function __construct(array $options = array())
-    {
-        $this->indentWidth = self::$defaultIndentWidth;
-        $this->setOptions($options);
+    if (isset($options['indent'])) {
+      $this->setIndent($options['indent']);
     }
-
-    /**
-     * Available options:
-     *  - indentWidth
-     *  - indent
-     *  - quote
-     *  - fgcolor
-     *  - bgcolor
-     *
-     * @param array $options
-     * @return TextFormater
-     */
-    public function setOptions(array $options)
-    {
-        if (isset($options['indentWidth'])) {
-            $this->setIndentWidth($options['indentWidth']);
-        }
-        if (isset($options['indent'])) {
-            $this->setIndent($options['indent']);
-        }
-        if (isset($options['quote'])) {
-            $this->setQuote($options['quote']);
-        }
-        if (isset($options['fgcolor'])) {
-            $this->setFgColor($options['fgcolor']);
-        }
-        if (isset($options['bgcolor'])) {
-            $this->setBgColor($options['bgcolor']);
-        }
-        return $this;
+    if (isset($options['quote'])) {
+      $this->setQuote($options['quote']);
     }
-
-    /**
-     * @param int $indent
-     * @return TextFormater
-     */
-    public function setIndentWidth($width)
-    {
-        $this->indentWidth = (int) $width;
-        return $this;
+    if (isset($options['fgcolor'])) {
+      $this->setFgColor($options['fgcolor']);
     }
-
-    /**
-     * @return int
-     */
-    public function getIndentWidth()
-    {
-        return $this->indentWidth;
+    if (isset($options['bgcolor'])) {
+      $this->setBgColor($options['bgcolor']);
     }
+    return $this;
+  }
 
-    /**
-     * @param int $indent
-     * @return TextFormater
-     */
-    public function setIndent($indent)
-    {
-        $this->indent = (int) $indent;
-        return $this;
-    }
+  /**
+   * @param int $indent
+   * @return TextFormater
+   */
+  function setIndentWidth($width) {
+    $this->indentWidth = (int) $width;
+    return $this;
+  }
 
-    /**
-     * @return int
-     */
-    public function getIndent()
-    {
-        return $this->indent;
-    }
+  /**
+   * @return int
+   */
+  function getIndentWidth() {
+    return $this->indentWidth;
+  }
 
-    /**
-     * @param string $quote
-     * @return TextFormater
-     */
-    public function setQuote($quote)
-    {
-        $this->quote = $quote;
-        return $this;
-    }
+  /**
+   * @param int $indent
+   * @return TextFormater
+   */
+  function setIndent($indent) {
+    $this->indent = (int) $indent;
+    return $this;
+  }
 
-    /**
-     * @return string
-     */
-    public function getQuote()
-    {
-        return $this->quote;
-    }
+  /**
+   * @return int
+   */
+  function getIndent() {
+    return $this->indent;
+  }
 
-    /**
-     * @param string $color
-     * @return TextFormater
-     */
-    public function setFgColor($color)
-    {
-        $this->fgColor = $color;
-        return $this;
-    }
+  /**
+   * @param string $quote
+   * @return TextFormater
+   */
+  function setQuote($quote) {
+    $this->quote = $quote;
+    return $this;
+  }
 
-    /**
-     * @return string
-     */
-    public function getFgColor()
-    {
-        return $this->fgColor;
-    }
+  /**
+   * @return string
+   */
+  function getQuote() {
+    return $this->quote;
+  }
 
-    /**
-     * @param string $color
-     * @return TextFormater
-     */
-    public function setBgColor($color)
-    {
-        $this->bgColor = $color;
-        return $this;
-    }
+  /**
+   * @param string $color
+   * @return TextFormater
+   */
+  function setFgColor($color) {
+    $this->fgColor = $color;
+    return $this;
+  }
 
-    /**
-     * @return string
-     */
-    public function getBgColor()
-    {
-        return $this->bgColor;
-    }
+  /**
+   * @return string
+   */
+  function getFgColor() {
+    return $this->fgColor;
+  }
 
-    /**
-     * Formats $text according to the formater's options
-     * 
-     * @param string $text
-     */
-    public function format($text)
-    {
-        $lines = explode("\n", $text);
-        foreach ($lines as &$line) {
-            $line = ((string) $this->quote)
-                  . str_repeat(' ', $this->indent * $this->indentWidth) 
-                  . $line;
-        }
-        return Colors::colorize(implode("\n", $lines), $this->fgColor, $this->bgColor);
+  /**
+   * @param string $color
+   * @return TextFormater
+   */
+  function setBgColor($color) {
+    $this->bgColor = $color;
+    return $this;
+  }
+
+  /**
+   * @return string
+   */
+  function getBgColor() {
+    return $this->bgColor;
+  }
+
+  /**
+   * Formats $text according to the formater's options
+   *
+   * @param string $text
+   */
+  function format($text) {
+    $lines = explode("\n", $text);
+    foreach ($lines as &$line) {
+      $line = ((string) $this->quote)
+        . str_repeat(' ', $this->indent * $this->indentWidth)
+        . $line;
     }
+    return Colors::colorize(implode("\n", $lines), $this->fgColor, $this->bgColor);
+  }
 }

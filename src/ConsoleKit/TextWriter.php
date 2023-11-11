@@ -10,22 +10,21 @@
 
 namespace ConsoleKit;
 
-interface TextWriter
-{
-    const STDOUT = 'stdout';
-    const STDERR = 'stderr';
+interface TextWriter {
+  const STDOUT = 'stdout';
+  const STDERR = 'stderr';
 
-    /**
-     * Outputs text
-     * 
-     * @param string $text
-     */
-    function write($test, $pipe = TextWriter::STDOUT);
+  /**
+   * Outputs text
+   *
+   * @param string $text
+   */
+  function write($test, $pipe = TextWriter::STDOUT);
 
-    /**
-     * Outputs text followed by a line break
-     * 
-     * @param string $text
-     */
-    function writeln($test = '', $pipe = TextWriter::STDOUT);
+  /**
+   * Outputs text followed by a line break
+   *
+   * @param string $text
+   */
+  function writeln($test = '', $pipe = TextWriter::STDOUT);
 }
